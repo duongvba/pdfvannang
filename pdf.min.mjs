@@ -1,3 +1,5 @@
+/* Polyfill: Safari (iOS) chưa hỗ trợ duyệt ReadableStream bằng for await */
+(function(){try{var RS=globalThis.ReadableStream;if(RS&&!RS.prototype[Symbol.asyncIterator]){var f=function(o){var r=this.getReader(),p=o&&o.preventCancel;return{next:function(){return r.read().then(function(x){if(x.done){r.releaseLock();}return x;});},return:function(v){var d=p?Promise.resolve():r.cancel(v);return d.then(function(){r.releaseLock();return{done:true,value:v};});},[Symbol.asyncIterator]:function(){return this;}};};RS.prototype[Symbol.asyncIterator]=f;if(!RS.prototype.values)RS.prototype.values=f;}}catch(e){}})();
 /**
  * @licstart The following is the entire license notice for the
  * JavaScript code in this page
