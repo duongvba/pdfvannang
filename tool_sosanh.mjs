@@ -211,7 +211,7 @@ export function initSoSanh(D) {
       st.cur = st.changes.length ? st.changes[0].pg : 0;
       await renderPage();
       const ocr = A.ocrPages + B.ocrPages;
-      status(st.changes.length ? `Tìm thấy ${st.changes.length} chỗ khác nhau${ocr ? ` (có ${ocr} trang scan đọc bằng OCR, có thể lệch vài chữ)` : ""}. Bấm vào từng dòng để xem vị trí.`
+      status(st.changes.length ? `Tìm thấy ${st.changes.length} chỗ khác nhau${ocr ? ` (có ${ocr} trang scan, có thể lệch vài chữ)` : ""}. Bấm vào từng dòng để xem vị trí.`
         : "Hai bản giống nhau về nội dung chữ.");
       D.trialUse("sosanh");
     } catch (e) { console.error(e); status("Lỗi khi so sánh: " + (e.message || e), true); }

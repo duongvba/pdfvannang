@@ -1,7 +1,7 @@
 {
-  "name": "Tách Hóa Đơn PDF",
-  "short_name": "Tách PDF",
-  "description": "Tách file PDF nhiều hóa đơn thành từng file, tự đặt tên theo tên đơn vị. Đọc được cả file scan (OCR).",
+  "name": "PDF Vạn Năng",
+  "short_name": "PDF Vạn Năng",
+  "description": "Bộ công cụ PDF cho văn phòng: tách hóa đơn và đặt tên theo đơn vị, nén PDF, che thông tin, so sánh 2 bản, chụp giấy tờ thành PDF.",
   "lang": "vi",
   "start_url": "./",
   "scope": "./",
@@ -9,8 +9,23 @@
   "background_color": "#f6f7f9",
   "theme_color": "#c0392b",
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }

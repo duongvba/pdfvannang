@@ -3,13 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tách Hóa Đơn PDF</title>
+<title>PDF Vạn Năng – Tách, nén, che, so sánh PDF ngay trên máy bạn</title>
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#c0392b">
 <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Tách PDF">
+<meta name="apple-mobile-web-app-title" content="PDF Vạn Năng">
+<meta name="application-name" content="PDF Vạn Năng">
+<meta name="description" content="PDF Vạn Năng: tách hóa đơn và đặt tên theo đơn vị, nén PDF, che thông tin nhạy cảm, so sánh 2 bản hợp đồng, chụp giấy tờ thành PDF. Xử lý ngay trên máy, không tải file lên mạng.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -223,6 +225,8 @@ tr.example td { color: var(--muted); font-style: italic; }
 .pophead { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; }
 .popwho { display: grid; gap: 2px; min-width: 0; } .popwho b { font: 700 16px var(--font-display); } .popwho .note { line-height: 1.4; }
 .acct { padding: 12px; border-radius: 10px; }
+.acct:has(#acctIn[hidden]) { padding: 0; border: none; background: none; }
+.note.fine { margin: 10px 0 0; font-size: 12px; } .note.fine a { color: inherit; }
 .acctrow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; } .acctrow b { font-size: 14px; word-break: break-all; }
 .plan { font: 700 11px var(--font-body); letter-spacing: .04em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; background: color-mix(in srgb, var(--warn) 18%, transparent); color: var(--warn); }
 .plan.pro { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
@@ -261,9 +265,9 @@ button.btn.sm { padding: 6px 12px; font-size: 13px; }
 </head>
 <body>
 <div class="topbar"><div class="topin">
-  <a class="brand" href="./" aria-label="Tách Hóa Đơn PDF – trang chủ">
+  <a class="brand" href="./" aria-label="PDF Vạn Năng – trang chủ">
     <img src="icons/favicon-32.png" alt="" width="30" height="30">
-    <span class="bname"><b>Tách Hóa Đơn PDF</b><small>Bộ công cụ PDF cho văn phòng</small></span>
+    <span class="bname"><b>PDF Vạn Năng</b><small>Bộ công cụ PDF cho văn phòng</small></span>
   </a>
   <div class="tbright">
     <button class="btn install" id="btnInstall" type="button" hidden title="Cài thành ứng dụng trên máy">⬇ Cài app</button>
@@ -278,18 +282,19 @@ button.btn.sm { padding: 6px 12px; font-size: 13px; }
       </div>
       <div class="acct" id="acctBox" hidden>
         <div id="acctOut">
-          <p class="note" style="margin:0 0 10px">Đăng nhập bằng Google để <b>dùng thử miễn phí</b>. Bản quyền được kích hoạt theo email của bạn, dùng được trên nhiều máy. App chỉ nhận email và tên, không đọc thư hay Drive.</p>
           <div id="gsiBtn"></div>
+          <p class="note fine">Bằng việc đăng nhập, bạn đồng ý với <a href="privacy.html" target="_blank" rel="noopener">Chính sách bảo mật</a>.</p>
         </div>
-        <div id="acctIn" hidden>
+        <div id="acctIn" hidden style="display:grid">
           <div class="acctrow"><span class="plan" id="acctPlanPill">Dùng thử</span><b id="acctEmail"></b></div>
           <p class="note" id="acctPlan" style="margin:0"></p>
+          <button class="btn sm" id="btnCopyEmail" type="button" hidden style="justify-self:start;margin-top:8px">📋 Sao chép email để gửi</button>
         </div>
       </div>
       <div class="usage" id="usageList"></div>
       <div class="popfoot" id="popFoot"><button class="btn sm" id="btnLogout" type="button" hidden>Đăng xuất</button></div>
       <details class="oldkey" id="oldKey">
-      <summary>Có mã kích hoạt theo Mã máy (khách mua trước đây)</summary>
+      <summary>Nhập mã kích hoạt</summary>
       <div class="licrow">
         <span>Mã máy:</span>
         <span class="mid" id="machineId">…</span>
@@ -326,7 +331,7 @@ button.btn.sm { padding: 6px 12px; font-size: 13px; }
   <section class="panel" aria-label="Thiết lập">
     <div class="drop" id="drop" tabindex="0" role="button" aria-describedby="dropHint">
       <strong>Kéo thả một hoặc nhiều file PDF vào đây, hoặc bấm để chọn</strong>
-      <small id="dropHint">Hóa đơn điện tử dạng chữ (MISA, VNPT, Viettel…). File scan (dạng ảnh) được đọc bằng OCR, chậm hơn và cần mạng ở lần đầu.</small>
+      <small id="dropHint">Hóa đơn điện tử dạng chữ (MISA, VNPT, Viettel…). Đọc được cả file scan (dạng ảnh), chậm hơn một chút và cần mạng ở lần đầu.</small>
       <span class="file" id="fileName"></span>
       <input type="file" id="fileInput" accept="application/pdf,.pdf" multiple hidden>
     </div>
@@ -374,7 +379,7 @@ button.btn.sm { padding: 6px 12px; font-size: 13px; }
 
     <details class="khbox namebox" id="khbox">
       <summary>Danh sách khách hàng (nên có khi dùng file scan)</summary>
-      <small class="note">Dán 2 cột từ Excel: <b>MST</b> và <b>Tên chuẩn</b>. Khi đọc được MST trên hóa đơn, tool lấy tên chuẩn để đặt tên file, tránh tên bị sai dấu do OCR. Danh sách được lưu trên trình duyệt của bạn.</small>
+      <small class="note">Dán 2 cột từ Excel: <b>MST</b> và <b>Tên chuẩn</b>. Khi đọc được MST trên hóa đơn, tool lấy tên chuẩn để đặt tên file, tránh tên bị sai dấu khi đọc file scan. Danh sách được lưu trên trình duyệt của bạn.</small>
       <textarea id="dskh" spellcheck="false" placeholder="0300000011	TRƯỜNG TIỂU HỌC MẪU SỐ 1&#10;0300000022	TRƯỜNG MẦM NON HOA MAI THỬ"></textarea>
       <span class="khcount" id="khcount">Chưa có khách hàng nào.</span>
     </details>
@@ -407,7 +412,7 @@ button.btn.sm { padding: 6px 12px; font-size: 13px; }
         </tbody>
       </table>
     </div>
-    <p class="note">Chương trình tìm các nhãn như "Tên đơn vị", "Mã số thuế", "Số", "Ngày … tháng … năm", "Ký hiệu", "Tổng tiền thanh toán" trên từng trang (nhận nhiều mẫu hóa đơn). Hóa đơn dài nhiều trang được gộp vào một file theo số hóa đơn. Tên trùng nhau được thêm (2), (3)… Trang scan được đọc bằng OCR: dòng vàng nên xem lại tên, dòng đỏ cần kiểm tra lại.</p>
+    <p class="note">Chương trình tìm các nhãn như "Tên đơn vị", "Mã số thuế", "Số", "Ngày … tháng … năm", "Ký hiệu", "Tổng tiền thanh toán" trên từng trang (nhận nhiều mẫu hóa đơn). Hóa đơn dài nhiều trang được gộp vào một file theo số hóa đơn. Tên trùng nhau được thêm (2), (3)… Với file scan: dòng vàng nên xem lại tên, dòng đỏ cần kiểm tra lại.</p>
   </section>
   </div>
 
@@ -675,7 +680,7 @@ function loadScript(src) {
     if (window.Tesseract) return res();
     const sc = document.createElement("script");
     sc.src = src; sc.onload = () => res();
-    sc.onerror = () => rej(new Error("Không tải được bộ OCR. Kiểm tra kết nối mạng rồi thử lại"));
+    sc.onerror = () => rej(new Error("Không tải được bộ đọc file scan. Kiểm tra kết nối mạng rồi thử lại"));
     document.head.appendChild(sc);
   });
 }
@@ -685,11 +690,11 @@ async function getOcrWorkers() {
   const n = Math.max(1, Math.min(3, Math.floor((navigator.hardwareConcurrency || 2) / 2)));
   const ws = [];
   for (let k = 0; k < n; k++) {
-    setStatus(`Đang tải bộ OCR tiếng Việt (${k + 1}/${n})… lần đầu có thể mất 10–30 giây.`);
+    setStatus(`Đang chuẩn bị bộ đọc file scan (${k + 1}/${n})… lần đầu có thể mất 10–30 giây.`);
     ws.push(await Promise.race([
       Tesseract.createWorker("vie", 1),
       new Promise((_, rej) => setTimeout(() => rej(new Error(
-        "Không tải được bộ OCR (quá 45 giây). Nếu bạn đang mở trang trong khung xem trước của Claude, OCR bị chặn ở đây, hãy mở trang trên GitHub Pages. Nếu đang mở trên web, kiểm tra kết nối mạng")), 45000)),
+        "Không tải được bộ đọc file scan (quá 45 giây). Kiểm tra kết nối mạng rồi thử lại")), 45000)),
     ]));
   }
   ocrWorkers = ws;
@@ -773,7 +778,7 @@ function planText(d) {
   if (d.plan === "pro") return `Bản quyền: ${d.exp ? "đến " + fmtDate(d.exp) : "vĩnh viễn"} · đang dùng ${d.devices.used}/${d.devices.max} máy.` + (cloud.acct.offline ? " Đang mất kết nối máy chủ, vẫn dùng được trong vài ngày." : "");
   if (d.plan === "device") return `Tài khoản có bản quyền nhưng đã dùng đủ ${d.devices.max} máy. Máy không mở app 30 ngày sẽ tự được gỡ, hoặc nhờ người bán xóa danh sách máy.`;
   if (d.plan === "locked") return "Tài khoản đã bị khóa. " + (d.contact || "");
-  return (d.expired ? "Bản quyền đã hết hạn, đang ở chế độ dùng thử. " : "Đang dùng thử. ") + `Muốn dùng không giới hạn: gửi email trên cho người bán. ${d.contact || ""}`;
+  return (d.expired ? "Bản quyền đã hết hạn. " : "") + `Để mua bản quyền: gửi email ${d.email} cho người bán. ${d.contact || ""}`;
 }
 function trialSummary() {
   return Object.keys(KIND_NAME).map((k) => `${KIND_NAME[k]} ${Math.min(freeOf(k) - leftOf(k), freeOf(k))}/${freeOf(k)}`).join(" · ");
@@ -798,6 +803,7 @@ function renderTop() {
     pl.className = "plan " + (d.plan === "pro" ? "pro" : d.plan === "trial" ? "" : "bad");
   }
   $("btnLogout").hidden = !inn;
+  $("btnCopyEmail").hidden = !(inn && d && d.plan !== "pro");
   $("licBadge").hidden = pro || needLogin;
   const ul = $("usageList");
   if (pro || needLogin || (cloud.CLOUD && cloud.acct.offline)) ul.innerHTML = "";
@@ -829,8 +835,8 @@ function renderLicCore() {
   b.classList.remove("on");
   if (cloud.CLOUD && !inn) {
     b.textContent = "Đăng nhập để dùng thử";
-    $("licTitle").textContent = "Đăng nhập để dùng thử";
-    $("licInfo").textContent = `Miễn phí: tách ${FREE.hd} hóa đơn, nén ${FREE.nen} file, các công cụ khác mỗi công cụ ${FREE.nhan} lần.`;
+    $("licTitle").textContent = "Đăng nhập";
+    $("licInfo").textContent = "Dùng thử miễn phí, không cần thẻ thanh toán.";
   } else if (cloud.CLOUD && d && (d.plan === "device" || d.plan === "locked")) {
     b.textContent = d.plan === "device" ? "Vượt số máy cho phép" : "Tài khoản bị khóa";
     $("licTitle").textContent = "Không dùng được bản quyền trên máy này";
@@ -851,9 +857,15 @@ function toggleLic(open) {
   $("licBadge").setAttribute("aria-expanded", String(!p.hidden));
   $("acctBtn").setAttribute("aria-expanded", String(!p.hidden));
   if (!p.hidden && cloud.CLOUD && !cloud.loggedIn()) showLoginButton();
+  if (p.hidden) licMsg("");
 }
 $("acctBtn").addEventListener("click", () => toggleLic());
 $("btnClosePop").addEventListener("click", () => toggleLic(false));
+$("btnCopyEmail").addEventListener("click", async () => {
+  const e = cloud.acct.data && cloud.acct.data.email; if (!e) return;
+  try { await navigator.clipboard.writeText(e); licMsg("Đã sao chép " + e + ". Dán vào tin nhắn Zalo gửi người bán.", "ok"); }
+  catch { licMsg("Email của bạn: " + e, "ok"); }
+});
 document.addEventListener("pointerdown", (e) => {
   const p = $("licPanel"); if (p.hidden) return;
   if (p.contains(e.target) || $("acctBtn").contains(e.target) || $("licBadge").contains(e.target)) return;
@@ -976,7 +988,7 @@ async function readFile(fi, file, groups, limit, t0, wantMoney) {
         batch.push({ idx: j, page: p2 }); j++;
       }
       const sec = Math.round((Date.now() - t0) / 1000);
-      setStatus(`Đang OCR trang ${i}${batch.length > 1 ? "–" + (j - 1) : ""}/${total} (${tag}file scan, ${sec}s)…`);
+      setStatus(`Đang đọc trang ${i}${batch.length > 1 ? "–" + (j - 1) : ""}/${total} (${tag}file scan, ${sec}s)…`);
       const texts = await Promise.all(batch.map((b, k) => ocrPage(workers[k], b.page, wantMoney)));
       for (let k = 0; k < batch.length; k++) {
         if (go) go = feed(parseInvoice(texts[k]), batch[k].idx, true);
@@ -1065,11 +1077,11 @@ async function run(limit) {
       const info = { ...g.info };
       const found = !!(info.mst && kh.has(normMST(info.mst)));
       if (found) info.donvi = kh.get(normMST(info.mst));
-      let level = "ok", msg = g.ocr ? "OK (OCR)" : "OK";
+      let level = "ok", msg = g.ocr ? "OK (file scan)" : "OK";
       if (!(info.so && info.donvi)) { level = "bad"; msg = "Thiếu thông tin"; }
-      else if (g.ocr && !info.mst) { level = "check"; msg = "OCR – không có MST, kiểm tra tên"; }
-      else if (g.ocr && kh.size && !found) { level = "bad"; msg = "OCR – MST không có trong danh sách"; }
-      else if (g.ocr && !found) { level = "check"; msg = "OCR – nên kiểm tra tên"; }
+      else if (g.ocr && !info.mst) { level = "check"; msg = "File scan – không có MST, kiểm tra tên"; }
+      else if (g.ocr && kh.size && !found) { level = "bad"; msg = "File scan – MST không có trong danh sách"; }
+      else if (g.ocr && !found) { level = "check"; msg = "File scan – nên kiểm tra tên"; }
       const p = g.pages, trang = p.length > 1 ? `${p[0] + 1}-${p[p.length - 1] + 1}` : String(p[0] + 1);
       return { ...info, g, level, msg, trang, nguon: state.files[g.fi].name,
         trangHien: multi ? `#${g.fi + 1}: ${trang}` : trang };
@@ -1267,6 +1279,7 @@ function showView(v, push) {
   window.__curView = v; try { renderLic(); } catch {}
   for (const [k, x] of Object.entries(VIEWS)) { $(x.el).hidden = k !== v; $(x.tab).setAttribute("aria-selected", String(k === v)); }
   $("appTitle").innerHTML = VIEWS[v].title; $("appSub").textContent = VIEWS[v].sub;
+  { const t = $("appTitle").textContent.replace(/\s+/g, " ").trim(); document.title = v === "tach" ? "PDF Vạn Năng – Tách hóa đơn, nén, che, so sánh PDF" : `${t} – PDF Vạn Năng`; }
   if (push && location.hash !== VIEWS[v].hash) { try { history.replaceState(null, "", VIEWS[v].hash); } catch {} }
   const t = $(VIEWS[v].tab); if (t.scrollIntoView) t.scrollIntoView({ block: "nearest", inline: "nearest" });
 }
@@ -1369,7 +1382,7 @@ $("btnNen").addEventListener("click", async () => {
     const warns = [];
     if (!res.fit) warns.push(`Đã nén ở mức thấp nhất nhưng vẫn lớn hơn ${fmtMB(tb)}. Thử kiểu Đen trắng, hoặc tách file thành 2 phần.`);
     if (res.levelIndex >= res.levels - 2 && res.fit) warns.push("Để đạt dung lượng này phải nén khá mạnh. Hãy xem kỹ vùng chữ nhỏ ở khung so sánh bên dưới.");
-    if (res.ocrLayerLost) warns.push("File gốc có lớp chữ OCR (bôi đen/copy được). Bản nén là ảnh nên không còn copy chữ được.");
+    if (res.ocrLayerLost) warns.push("File gốc có lớp chữ ẩn (bôi đen/copy được). Bản nén là ảnh nên không còn copy chữ được.");
     $("nenWarn").hidden = !warns.length; $("nenWarn").innerHTML = warns.length ? `<b>Lưu ý</b><ul>${warns.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>` : "";
     $("nenPage").max = res.pages; $("nenPage").value = 1;
     $("nenResult").hidden = false;

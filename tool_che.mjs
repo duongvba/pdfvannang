@@ -19,7 +19,7 @@ const HTML = `
 <section class="panel" aria-label="Che thông tin">
   <div class="drop" id="chDrop" tabindex="0" role="button" aria-describedby="chHint">
     <strong>Kéo thả file PDF cần che thông tin vào đây hoặc bấm để chọn</strong>
-    <small id="chHint">Hồ sơ nhân sự, hợp đồng, sao kê… Đọc được cả file scan (OCR).</small>
+    <small id="chHint">Hồ sơ nhân sự, hợp đồng, sao kê… Đọc được cả file scan.</small>
     <span class="file" id="chFileName"></span>
     <input type="file" id="chInput" accept="application/pdf,.pdf" hidden>
   </div>
@@ -238,7 +238,7 @@ export function initChe(D) {
         const vp = page.getViewport({ scale: 1 });
         let lines = await textLines(page), ocr = false;
         if (lines.reduce((a, l) => a + l.text.replace(/\s/g, "").length, 0) < 30) {
-          status(`Đang OCR trang ${n}/${pdf.numPages} (file scan)…`);
+          status(`Đang đọc trang ${n}/${pdf.numPages} (file scan)…`);
           lines = await ocrLines(page); ocr = true; ocrCount++;
         } else status(`Đang tìm ở trang ${n}/${pdf.numPages}…`);
         st.pages.push({ n, w: vp.width, h: vp.height, ocr });
@@ -250,7 +250,7 @@ export function initChe(D) {
       await renderReview();
       const pg = new Set(st.boxes.map((b) => b.page)).size;
       status(st.boxes.length
-        ? `Tìm thấy ${st.boxes.length} chỗ cần che trên ${pg} trang${ocrCount ? ` (OCR ${ocrCount} trang scan)` : ""}. Xem lại bên dưới, rồi bấm "Che và tạo file".`
+        ? `Tìm thấy ${st.boxes.length} chỗ cần che trên ${pg} trang${ocrCount ? ` (có ${ocrCount} trang scan)` : ""}. Xem lại bên dưới, rồi bấm "Che và tạo file".`
         : `Không tìm thấy thông tin nào theo lựa chọn. Bạn vẫn có thể kéo chuột trên trang để che bằng tay, rồi bấm "Che và tạo file".`);
       D.trialUse("che");
     } catch (e) { console.error(e); status("Lỗi khi tìm: " + (e.message || e), true); }

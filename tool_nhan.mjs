@@ -8,7 +8,7 @@ const HTML = `
 <section class="panel" aria-label="Tách theo nhãn">
   <div class="drop" id="nhDrop" tabindex="0" role="button" aria-describedby="nhHint">
     <strong>Kéo thả một hoặc nhiều file PDF vào đây, hoặc bấm để chọn</strong>
-    <small id="nhHint">Phiếu lương, giấy báo, giấy mời, chứng chỉ… in nối tiếp trong 1 file. Đọc được cả file scan (OCR).</small>
+    <small id="nhHint">Phiếu lương, giấy báo, giấy mời, chứng chỉ… in nối tiếp trong 1 file. Đọc được cả file scan.</small>
     <span class="file" id="nhFileName"></span>
     <input type="file" id="nhInput" accept="application/pdf,.pdf" multiple hidden>
   </div>
@@ -163,7 +163,7 @@ export function initNhan(D) {
           let txt = await D.pageLines(page), ocr = false;
           if (D.isImagePage(txt)) {
             const ws = await D.getOcrWorkers();
-            status(`Đang OCR trang ${n}/${pdf.numPages} (file scan, ${Math.round((Date.now() - t0) / 1000)}s)…`);
+            status(`Đang đọc trang ${n}/${pdf.numPages} (file scan, ${Math.round((Date.now() - t0) / 1000)}s)…`);
             txt = await D.ocrPage(ws[0], page, true); ocr = true;
           }
           page.cleanup();
@@ -201,7 +201,7 @@ export function initNhan(D) {
         const k = name.toLowerCase(), c = (used.get(k) || 0) + 1; used.set(k, c);
         if (c > 1) name += ` (${c})`;
         const ok = !!g.v1 && !g.ocr;
-        const msg = !g.v1 ? `Không thấy nhãn "${l1}"` : g.ocr ? "OK (OCR) – nên kiểm tra tên" : "OK";
+        const msg = !g.v1 ? `Không thấy nhãn "${l1}"` : g.ocr ? "OK (file scan) – nên kiểm tra tên" : "OK";
         const p = g.pages, trang = p.length > 1 ? `${p[0] + 1}-${p[p.length - 1] + 1}` : String(p[0] + 1);
         const r = { v1: g.v1, v2: g.v2, file: name + ".pdf", bytes, ok, msg, trang, nguon: st.files[g.fi].name,
           trangHien: st.files.length > 1 ? `#${g.fi + 1}: ${trang}` : trang };
