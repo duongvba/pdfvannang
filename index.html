@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tách Hóa Đơn PDF</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#c0392b">
+<link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tách PDF">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -18,6 +24,7 @@
   --ok: #1f7a4d;
   --warn: #b26a00;
   --tint: #fbeceb;
+  --checkbg: #fff5d6;
   --font-display: "Be Vietnam Pro", "Segoe UI", system-ui, sans-serif;
   --font-body: "Be Vietnam Pro", "Segoe UI", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", Consolas, monospace;
@@ -26,16 +33,17 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --paper: #12171e; --sheet: #1a212b; --ink: #e6ebf1; --muted: #9aa7b6;
-    --line: #2c3643; --stamp: #ef6b5d; --ok: #4cc38a; --warn: #f0a63a; --tint: #3a2222;
+    --line: #2c3643; --stamp: #ef6b5d; --ok: #4cc38a; --warn: #f0a63a; --tint: #3a2222; --checkbg: #3a3218;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --paper: #12171e; --sheet: #1a212b; --ink: #e6ebf1; --muted: #9aa7b6;
-  --line: #2c3643; --stamp: #ef6b5d; --ok: #4cc38a; --warn: #f0a63a; --tint: #3a2222;
+  --line: #2c3643; --stamp: #ef6b5d; --ok: #4cc38a; --warn: #f0a63a; --tint: #3a2222; --checkbg: #3a3218;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html, body { margin: 0; }
 body { background: var(--paper); color: var(--ink); font: 15px/1.5 var(--font-body); }
 main { max-width: 1080px; margin: 0 auto; padding: 28px 20px 48px; display: grid; gap: 20px; }
@@ -43,6 +51,27 @@ header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content:
 h1 { font: 700 26px/1.2 var(--font-display); margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
 h1 span { color: var(--stamp); }
 .sub { margin: 4px 0 0; color: var(--muted); max-width: 62ch; }
+.licbadge { font: 600 13px var(--font-body); border-radius: 999px; padding: 4px 12px; cursor: pointer; border: 1px solid var(--warn); color: var(--warn); background: var(--sheet); }
+.themebtn { font: 600 13px var(--font-body); border-radius: 999px; padding: 4px 12px; cursor: pointer; border: 1px solid var(--line); color: var(--ink); background: var(--sheet); }
+.themebtn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.licbadge.on { border-color: var(--ok); color: var(--ok); }
+.licbadge:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.licpanel { display: grid; gap: 12px; border-left: 4px solid var(--stamp); }
+.licpanel h2 { margin: 0; font: 700 17px var(--font-display); }
+.licrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.mid { font: 600 18px var(--font-mono); letter-spacing: .06em; padding: 6px 12px; border: 1px dashed var(--line); border-radius: 6px; background: var(--paper); }
+.licpanel textarea { width: 100%; min-height: 64px; font: 13px var(--font-mono); padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); word-break: break-all; }
+.licmsg { font-size: 14px; }
+.acct { display: grid; gap: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+.acct b { word-break: break-all; }
+.oldkey { display: grid; gap: 10px; }
+.oldkey > summary { cursor: pointer; font-size: 14px; color: var(--muted, #667085); }
+.oldkey[open] > summary { margin-bottom: 6px; }
+.oldkey.solo > summary { display: none; }
+#gsiBtn { min-height: 44px; }
+.licmsg.err { color: var(--stamp); } .licmsg.ok { color: var(--ok); }
+.headright { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button.btn.install { padding: 5px 12px; font-size: 13px; border-color: var(--stamp); color: var(--stamp); }
 .privacy { font-size: 13px; color: var(--ok); border: 1px solid var(--ok); border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
 
 .panel { background: var(--sheet); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 14px; }
@@ -50,7 +79,8 @@ h1 span { color: var(--stamp); }
 .drop:hover, .drop.over, .drop:focus-visible { border-color: var(--stamp); background: var(--tint); outline: none; }
 .drop strong { display: block; font-size: 16px; }
 .drop small { color: var(--muted); }
-.drop .file { font-family: var(--font-mono); color: var(--stamp); margin-top: 6px; display: block; word-break: break-all; }
+.drop .file { font-family: var(--font-mono); color: var(--stamp); margin-top: 6px; display: block; overflow-wrap: anywhere; }
+.drop .file .sz { white-space: nowrap; }
 
 .row { display: grid; grid-template-columns: 140px 1fr; gap: 10px; align-items: center; }
 label { font-weight: 600; }
@@ -78,6 +108,55 @@ select:focus-visible { outline: 2px solid var(--stamp); outline-offset: 1px; }
 .adv summary { cursor: pointer; color: var(--muted); font-size: 14px; }
 .adv .row { margin-top: 8px; }
 code { font-family: var(--font-mono); font-size: 13px; }
+.optrow { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.optrow label { font-weight: 400; display: inline-flex; gap: 8px; align-items: center; cursor: pointer; }
+.optrow input { width: 16px; height: 16px; accent-color: var(--stamp); }
+.lblgrid { display: grid; grid-template-columns: 170px 1fr; gap: 8px; align-items: center; margin-top: 8px; }
+.lblgrid input { width: 100%; font: 14px var(--font-body); padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--sheet); color: var(--ink); }
+@media (max-width: 560px) { .lblgrid { grid-template-columns: 1fr; } }
+.checks { display: grid; gap: 6px; border: 1px solid var(--warn); border-radius: 8px; padding: 10px 14px; background: var(--checkbg); font-size: 14px; }
+.checks b { color: var(--warn); }
+.checks ul { margin: 0; padding-left: 18px; }
+td.num { white-space: nowrap; }
+td.money { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tabs { display: flex; gap: 4px; box-shadow: inset 0 -1px 0 var(--line); overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { white-space: nowrap; flex: none; }
+.tab { font: 600 15px var(--font-body); padding: 9px 16px; border: 1px solid transparent; border-bottom: none; border-radius: 8px 8px 0 0; background: none; color: var(--muted); cursor: pointer; }
+.tab[aria-selected="true"] { background: var(--sheet); color: var(--ink); border-color: var(--line); }
+.tab:focus-visible { outline: 2px solid var(--stamp); outline-offset: -2px; }
+.tab .new { font-size: 11px; color: #fff; background: var(--stamp); border-radius: 999px; padding: 1px 6px; margin-left: 4px; vertical-align: 2px; }
+.modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; }
+.mode { text-align: left; display: grid; gap: 2px; padding: 10px 12px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--sheet); color: var(--ink); cursor: pointer; font: 14px var(--font-body); }
+.mode b { font-size: 15px; }
+.mode small { color: var(--muted); }
+.mode[aria-pressed="true"] { border-color: var(--stamp); background: var(--tint); }
+.mode:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.mode:disabled { opacity: .5; cursor: not-allowed; }
+.target { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.target input { width: 90px; font: 15px var(--font-body); padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--sheet); color: var(--ink); }
+.bigstat { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 18px; font-variant-numeric: tabular-nums; }
+.bigstat .from { font-size: 20px; color: var(--muted); text-decoration: line-through; }
+.bigstat .to { font: 700 30px var(--font-display); color: var(--ok); }
+.bigstat .pct { font: 700 18px var(--font-display); color: var(--ok); }
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.compare figure { margin: 0; display: grid; gap: 4px; }
+.compare figcaption { font-size: 13px; color: var(--muted); font-weight: 600; }
+.compare .cv { border: 1px solid var(--line); border-radius: 6px; overflow: auto; max-height: 520px; background: #fff; }
+.compare canvas { display: block; width: 100%; height: auto; }
+@media (max-width: 640px) { .compare { grid-template-columns: 1fr; } }
+.viewer { position: fixed; inset: 0; z-index: 50; background: rgba(20, 26, 34, .82); display: grid; grid-template-rows: auto 1fr; }
+.vbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 14px; background: var(--sheet); border-bottom: 1px solid var(--line); }
+.vbar .vtitle { font: 600 15px var(--font-mono); flex: 1 1 240px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vbar .vinfo { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.vbar .btn { padding: 6px 12px; }
+.vbody { overflow: auto; padding: 18px 10px 40px; display: grid; justify-items: center; gap: 14px; align-content: start; }
+.vpage { background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,.35); position: relative; }
+.vpage canvas { display: block; }
+.vpage .vnum { position: absolute; right: 6px; bottom: 6px; font-size: 12px; background: rgba(0,0,0,.55); color: #fff; padding: 1px 7px; border-radius: 10px; }
+.linkbtn + .linkbtn { margin-left: 10px; }
+.chip { font: 13px var(--font-body); border: 1px solid var(--line); background: var(--sheet); color: var(--ink); border-radius: 999px; padding: 3px 10px; cursor: pointer; }
+.chip:hover, .chip:focus-visible { border-color: var(--stamp); outline: none; }
 .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 button.btn { font: 600 15px var(--font-body); border-radius: 6px; padding: 9px 16px; cursor: pointer; border: 1px solid var(--line); background: var(--sheet); color: var(--ink); }
 button.btn.primary { background: var(--stamp); border-color: var(--stamp); color: #fff; }
@@ -100,6 +179,12 @@ th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--lin
 th { font-weight: 600; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; background: var(--paper); position: sticky; top: 0; }
 td.num, td.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 tr.bad td { background: var(--tint); }
+tr.check td { background: var(--checkbg); }
+.khbox textarea { width: 100%; min-height: 110px; font: 13px var(--font-mono); padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--sheet); color: var(--ink); resize: vertical; }
+.khbox textarea:focus-visible { outline: 2px solid var(--stamp); outline-offset: 1px; }
+.khbox summary { cursor: pointer; font-weight: 600; }
+.khbox[open] { display: grid; gap: 8px; }
+.khcount { font-size: 13px; color: var(--muted); }
 tr.example td { color: var(--muted); font-style: italic; }
 .tag { font-size: 12px; border-radius: 4px; padding: 1px 6px; font-weight: 600; }
 .tag.ok { color: var(--ok); }
@@ -111,23 +196,70 @@ tr.example td { color: var(--muted); font-style: italic; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
+<script>try { var t = localStorage.getItem("tachpdf_theme"); if (t === "dark" || t === "light") document.documentElement.dataset.theme = t; } catch (e) {}</script>
 </head>
 <body>
 <main>
   <header>
     <div>
-      <h1>Tách hóa đơn PDF <span>theo tên đơn vị</span></h1>
-      <p class="sub">Thả file PDF gồm nhiều hóa đơn. Mỗi hóa đơn được tách thành một file riêng, đặt tên theo dòng "Tên đơn vị" in trên hóa đơn, rồi tải về một file ZIP.</p>
+      <h1 id="appTitle">Tách hóa đơn PDF <span>theo tên đơn vị</span></h1>
+      <p class="sub" id="appSub">Thả file PDF gồm nhiều hóa đơn. Mỗi hóa đơn được tách thành một file riêng, đặt tên theo dòng "Tên đơn vị" in trên hóa đơn, rồi tải về một file ZIP.</p>
     </div>
+    <div class="headright">
+    <button class="themebtn" id="btnTheme" type="button" title="Đổi giao diện sáng / tối">🌓 Tự động</button>
+    <button class="licbadge" id="licBadge" type="button" aria-controls="licPanel" aria-expanded="false">Bản dùng thử</button>
+    <button class="btn install" id="btnInstall" type="button" hidden>⬇ Cài đặt ứng dụng</button>
     <span class="privacy" title="Trang chạy trên trình duyệt: file PDF bạn chọn được xử lý tại máy bạn, không gửi lên máy chủ nào.">🔒 Bảo mật dữ liệu PDF</span>
+    </div>
   </header>
 
+  <nav class="tabs" role="tablist" aria-label="Chọn công cụ">
+    <button class="tab" role="tab" id="tabTach" aria-controls="viewTach" aria-selected="true" data-view="tach">Tách hóa đơn</button>
+    <button class="tab" role="tab" id="tabNen" aria-controls="viewNen" aria-selected="false" data-view="nen">Nén PDF</button>
+    <button class="tab" role="tab" id="tabNhan" aria-controls="viewNhan" aria-selected="false" data-view="nhan">Tách theo nhãn <span class="new">Mới</span></button>
+    <button class="tab" role="tab" id="tabChe" aria-controls="viewChe" aria-selected="false" data-view="che">Che thông tin <span class="new">Mới</span></button>
+    <button class="tab" role="tab" id="tabSoSanh" aria-controls="viewSoSanh" aria-selected="false" data-view="sosanh">So sánh 2 bản <span class="new">Mới</span></button>
+    <button class="tab" role="tab" id="tabChup" aria-controls="viewChup" aria-selected="false" data-view="chup">Chụp giấy tờ <span class="new">Mới</span></button>
+  </nav>
+
+  <section class="panel licpanel" id="licPanel" aria-label="Bản quyền" hidden>
+    <h2 id="licTitle">Kích hoạt bản quyền</h2>
+    <p class="note" id="licInfo"></p>
+    <div class="acct" id="acctBox" hidden>
+      <div id="acctOut">
+        <p class="note" style="margin:0 0 8px">Đăng nhập bằng tài khoản Google để <b>dùng thử miễn phí</b> và để người bán kích hoạt bản quyền theo email của bạn. App chỉ nhận email, không đọc thư hay file Drive của bạn.</p>
+        <div id="gsiBtn"></div>
+      </div>
+      <div id="acctIn" hidden>
+        <div class="licrow"><span>Tài khoản:</span><b id="acctEmail"></b><button class="btn" id="btnLogout" type="button">Đăng xuất</button></div>
+        <p class="note" id="acctPlan" style="margin:0"></p>
+      </div>
+    </div>
+    <details class="oldkey" id="oldKey">
+    <summary>Có mã kích hoạt theo Mã máy (khách mua trước đây)</summary>
+    <div class="licrow">
+      <span>Mã máy của bạn:</span>
+      <span class="mid" id="machineId">…</span>
+      <button class="btn" id="btnCopyMid" type="button">Sao chép</button>
+    </div>
+    <p class="note">Gửi <b>Mã máy</b> cho người bán qua Zalo để nhận mã kích hoạt. Mã kích hoạt chỉ dùng được trên máy này và trình duyệt này.</p>
+    <label for="licKey">Mã kích hoạt</label>
+    <textarea id="licKey" spellcheck="false" placeholder="TPDF1.xxxxx.yyyyy"></textarea>
+    <div class="licrow">
+      <button class="btn primary" id="btnActivate" type="button">Kích hoạt</button>
+      <button class="btn" id="btnRemoveLic" type="button" hidden>Gỡ mã trên máy này</button>
+    </div>
+    </details>
+    <span class="licmsg" id="licMsg" role="status"></span>
+  </section>
+
+  <div id="viewTach" role="tabpanel" aria-labelledby="tabTach" style="display:grid; gap:20px;">
   <section class="panel" aria-label="Thiết lập">
     <div class="drop" id="drop" tabindex="0" role="button" aria-describedby="dropHint">
-      <strong>Kéo thả file PDF vào đây hoặc bấm để chọn</strong>
-      <small id="dropHint">Hóa đơn điện tử dạng chữ (MISA, VNPT, Viettel…). File scan dạng ảnh chưa hỗ trợ.</small>
+      <strong>Kéo thả một hoặc nhiều file PDF vào đây, hoặc bấm để chọn</strong>
+      <small id="dropHint">Hóa đơn điện tử dạng chữ (MISA, VNPT, Viettel…). File scan (dạng ảnh) được đọc bằng OCR, chậm hơn và cần mạng ở lần đầu.</small>
       <span class="file" id="fileName"></span>
-      <input type="file" id="fileInput" accept="application/pdf,.pdf" hidden>
+      <input type="file" id="fileInput" accept="application/pdf,.pdf" multiple hidden>
     </div>
 
     <div class="namebox" id="namebox">
@@ -162,13 +294,32 @@ tr.example td { color: var(--muted); font-style: italic; }
           <input type="text" id="tpl" value="{so}_{donvi}" spellcheck="false">
         </div>
         <p class="note">Có thể gõ thêm chữ cố định, ví dụ <code>HD_{so}_{donvi}</code>. Các mã: {so} {donvi} {mst} {ngay} {kyhieu}.</p>
+        <p class="note"><b>Nhãn bổ sung cho mẫu hóa đơn khác</b> (không bắt buộc). Tool đã nhận sẵn nhãn của MISA, VNPT, Viettel, BKAV… Nếu mẫu của bạn ghi khác, gõ đúng chữ in trên hóa đơn, nhiều nhãn cách nhau bằng dấu phẩy.</p>
+        <div class="lblgrid">
+          <label for="lbDonvi">Tên khách / đơn vị mua</label><input type="text" id="lbDonvi" placeholder="VD: Bên nhận, Đơn vị nhận hàng">
+          <label for="lbMst">Mã số thuế người mua</label><input type="text" id="lbMst" placeholder="VD: MST bên mua">
+          <label for="lbTong">Tổng tiền thanh toán</label><input type="text" id="lbTong" placeholder="VD: Số tiền phải trả">
+        </div>
       </details>
+    </div>
+
+    <details class="khbox namebox" id="khbox">
+      <summary>Danh sách khách hàng (nên có khi dùng file scan)</summary>
+      <small class="note">Dán 2 cột từ Excel: <b>MST</b> và <b>Tên chuẩn</b>. Khi đọc được MST trên hóa đơn, tool lấy tên chuẩn để đặt tên file, tránh tên bị sai dấu do OCR. Danh sách được lưu trên trình duyệt của bạn.</small>
+      <textarea id="dskh" spellcheck="false" placeholder="0300000011	TRƯỜNG TIỂU HỌC MẪU SỐ 1&#10;0300000022	TRƯỜNG MẦM NON HOA MAI THỬ"></textarea>
+      <span class="khcount" id="khcount">Chưa có khách hàng nào.</span>
+    </details>
+
+    <div class="optrow" role="group" aria-label="Tùy chọn xử lý">
+      <label><input type="checkbox" id="optMoney" checked> Đọc số tiền để lập bảng kê Excel</label>
+      <label><input type="checkbox" id="optMerge"> Gộp các hóa đơn của cùng một khách vào 1 file</label>
     </div>
 
     <div class="actions">
       <button class="btn" id="btnTest" type="button" disabled>Thử 10 hóa đơn đầu</button>
       <button class="btn primary" id="btnRun" type="button" disabled>Tách toàn bộ</button>
       <button class="btn" id="btnZip" type="button" disabled>Tải ZIP kết quả</button>
+      <button class="btn" id="btnXlsx" type="button" disabled>Tải bảng kê Excel</button>
       <button class="btn" id="btnStop" type="button" hidden>Dừng</button>
     </div>
     <div class="progress" aria-hidden="true"><div id="bar"></div></div>
@@ -177,27 +328,119 @@ tr.example td { color: var(--muted); font-style: italic; }
 
   <section aria-label="Kết quả" style="display:grid; gap:10px;">
     <div class="summary" id="summary"></div>
+    <div class="checks" id="checks" hidden></div>
     <div class="tablewrap">
       <table>
-        <thead><tr><th>#</th><th>Số HĐ</th><th>Tên đơn vị</th><th>MST</th><th>Trang</th><th>Tên file</th><th>Trạng thái</th><th></th></tr></thead>
+        <thead><tr><th>#</th><th>Số HĐ</th><th>Tên đơn vị</th><th>MST</th><th>Tổng tiền</th><th>Trang</th><th>Tên file</th><th>Trạng thái</th><th></th></tr></thead>
         <tbody id="tbody">
-          <tr class="example"><td class="num">1</td><td class="mono">00002597</td><td>TRƯỜNG TIỂU HỌC AN HẠ</td><td class="mono">0307276287</td><td class="num">1</td><td class="mono">00002597_TRƯỜNG TIỂU HỌC AN HẠ.pdf</td><td>Ví dụ</td><td></td></tr>
-          <tr class="example"><td class="num">2</td><td class="mono">00002596</td><td>TRƯỜNG MẦM NON HƯỚNG DƯƠNG</td><td class="mono">0316665480</td><td class="num">2</td><td class="mono">00002596_TRƯỜNG MẦM NON HƯỚNG DƯƠNG.pdf</td><td>Ví dụ</td><td></td></tr>
+          <tr class="example"><td class="num">1</td><td class="mono">00000123</td><td>CÔNG TY TNHH MẪU THỬ A</td><td class="mono">0123456789</td><td class="money">12.500.000</td><td class="num">1</td><td class="mono">00000123_CÔNG TY TNHH MẪU THỬ A.pdf</td><td>Ví dụ</td><td></td></tr>
+          <tr class="example"><td class="num">2</td><td class="mono">00000124</td><td>CỬA HÀNG VĂN PHÒNG PHẨM B</td><td class="mono">0987654321</td><td class="money">3.240.000</td><td class="num">2</td><td class="mono">00000124_CỬA HÀNG VĂN PHÒNG PHẨM B.pdf</td><td>Ví dụ</td><td></td></tr>
         </tbody>
       </table>
     </div>
-    <p class="note">Chương trình tìm các nhãn "Tên đơn vị", "Mã số thuế", "Số", "Ngày … tháng … năm", "Ký hiệu" trên từng trang. Hóa đơn dài nhiều trang được gộp vào một file theo số hóa đơn. Tên trùng nhau được thêm (2), (3)… Dòng tô đỏ cần kiểm tra lại.</p>
+    <p class="note">Chương trình tìm các nhãn như "Tên đơn vị", "Mã số thuế", "Số", "Ngày … tháng … năm", "Ký hiệu", "Tổng tiền thanh toán" trên từng trang (nhận nhiều mẫu hóa đơn). Hóa đơn dài nhiều trang được gộp vào một file theo số hóa đơn. Tên trùng nhau được thêm (2), (3)… Trang scan được đọc bằng OCR: dòng vàng nên xem lại tên, dòng đỏ cần kiểm tra lại.</p>
   </section>
+  </div>
+
+  <div id="viewNen" role="tabpanel" aria-labelledby="tabNen" hidden style="display:grid; gap:20px;">
+  <section class="panel" aria-label="Nén PDF">
+    <div class="drop" id="dropNen" tabindex="0" role="button" aria-describedby="dropNenHint">
+      <strong>Kéo thả file PDF cần nén vào đây hoặc bấm để chọn</strong>
+      <small id="dropNenHint">Hợp nhất với file scan (tài liệu, hợp đồng, hồ sơ). Trang PDF dạng chữ được giữ nguyên.</small>
+      <span class="file" id="nenFileName"></span>
+      <input type="file" id="nenInput" accept="application/pdf,.pdf" hidden>
+    </div>
+
+    <div class="namebox">
+      <div class="namehead"><strong>Kiểu nén</strong><small>Chọn theo loại tài liệu. Không chắc thì để Tự động.</small></div>
+      <div class="modes" id="modes" role="group" aria-label="Kiểu nén">
+        <button class="mode" type="button" data-mode="auto" aria-pressed="true"><b>Tự động</b><small>Trang chữ chuyển xám cho nét; trang có dấu đỏ, ảnh màu giữ màu.</small></button>
+        <button class="mode" type="button" data-mode="bw" aria-pressed="false"><b>Đen trắng</b><small>Nhẹ nhất, chữ sắc nhất. Hợp văn bản, hợp đồng.</small></button>
+        <button class="mode" type="button" data-mode="gray" aria-pressed="false"><b>Xám</b><small>Giữ độ đậm nhạt của chữ ký mờ, bảng biểu.</small></button>
+        <button class="mode" type="button" data-mode="color" aria-pressed="false"><b>Giữ màu</b><small>Ảnh màu, tài liệu nhiều màu. Nặng nhất.</small></button>
+      </div>
+      <div class="target">
+        <label for="nenTarget">Dung lượng tối đa</label>
+        <select id="nenTarget">
+          <option value="2">2 MB</option>
+          <option value="5">5 MB</option>
+          <option value="10" selected>10 MB</option>
+          <option value="20">20 MB</option>
+          <option value="custom">Tự nhập…</option>
+          <option value="0">Không giới hạn (ưu tiên nét)</option>
+        </select>
+        <input type="number" id="nenCustom" min="0.5" step="0.5" value="8" hidden aria-label="Dung lượng tối đa tự nhập (MB)">
+        <span class="note" id="nenCustomUnit" hidden>MB</span>
+      </div>
+      <p class="note">Tool tự chọn mức nét nhất mà vẫn nằm dưới dung lượng tối đa.</p>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" id="btnNen" type="button" disabled>Nén PDF</button>
+      <button class="btn" id="btnNenView" type="button" disabled>Xem file đã nén</button>
+      <button class="btn" id="btnNenSave" type="button" disabled>Tải file đã nén</button>
+      <button class="btn" id="btnNenStop" type="button" hidden>Dừng</button>
+    </div>
+    <div class="progress" aria-hidden="true"><div id="nenBar"></div></div>
+    <div class="status" id="nenStatus" role="status">Chưa chọn file.</div>
+  </section>
+
+  <section class="panel" id="nenResult" aria-label="Kết quả nén" hidden>
+    <div class="bigstat"><span class="from" id="nenFrom"></span><span>→</span><span class="to" id="nenTo"></span><span class="pct" id="nenPct"></span></div>
+    <div class="summary" id="nenInfo"></div>
+    <div class="checks" id="nenWarn" hidden></div>
+    <div class="target">
+      <label for="nenPage">So sánh trang</label>
+      <input type="number" id="nenPage" min="1" value="1">
+      <select id="nenRegion" aria-label="Vùng so sánh">
+        <option value="top">Phóng to góc trên (đọc chữ)</option>
+        <option value="mid">Phóng to giữa trang</option>
+        <option value="bot">Phóng to góc dưới (dấu, chữ ký)</option>
+        <option value="all">Cả trang</option>
+      </select>
+    </div>
+    <div class="compare">
+      <figure><figcaption id="capBefore">Trước</figcaption><div class="cv"><canvas id="cvBefore"></canvas></div></figure>
+      <figure><figcaption id="capAfter">Sau khi nén</figcaption><div class="cv"><canvas id="cvAfter"></canvas></div></figure>
+    </div>
+  </section>
+  </div>
+
+  <div id="viewNhan" role="tabpanel" aria-labelledby="tabNhan" hidden style="display:grid; gap:20px;"></div>
+  <div id="viewChe" role="tabpanel" aria-labelledby="tabChe" hidden style="display:grid; gap:20px;"></div>
+  <div id="viewSoSanh" role="tabpanel" aria-labelledby="tabSoSanh" hidden style="display:grid; gap:20px;"></div>
+  <div id="viewChup" role="tabpanel" aria-labelledby="tabChup" hidden style="display:grid; gap:20px;"></div>
 </main>
+
+<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-labelledby="vTitle" hidden>
+  <div class="vbar">
+    <span class="vtitle" id="vTitle"></span>
+    <span class="vinfo" id="vInfo"></span>
+    <button class="btn" id="vZoomOut" type="button" aria-label="Thu nhỏ">−</button>
+    <button class="btn" id="vZoomIn" type="button" aria-label="Phóng to">+</button>
+    <button class="btn" id="vSave" type="button">Tải file này</button>
+    <button class="btn primary" id="vClose" type="button">Đóng</button>
+  </div>
+  <div class="vbody" id="vBody"></div>
+</div>
 
 <script src="./pdf-lib.min.js"></script>
 <script src="./jszip.min.js"></script>
 <script type="module">
 import * as pdfjsLib from "./pdf.min.mjs";
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL("./pdf.worker.min.mjs", import.meta.url).href;
+import { parseInvoice as parseRaw, fold } from "./parser.mjs";
+import { buildXlsx } from "./xlsx.mjs";
+import { compressPdf, renderRegion } from "./compress.mjs";
+import { initNhan } from "./tool_nhan.mjs";
+import * as cloud from "./cloud.mjs";
+import { ALLOW_OFFLINE_KEY } from "./config.mjs";
+import { initChe } from "./tool_che.mjs";
+import { initSoSanh } from "./tool_sosanh.mjs";
+import { initChup } from "./tool_chup.mjs";
 
 const $ = (id) => document.getElementById(id);
-const state = { file: null, bytes: null, results: [], zipBlob: null, stop: false, running: false };
+const state = { files: [], results: [], checks: null, zipBlob: null, xlsxBlob: null, stop: false, running: false };
 
 /* ---------- đọc chữ theo dòng ---------- */
 async function pageLines(page) {
@@ -227,28 +470,23 @@ async function pageLines(page) {
   }).join("\n");
 }
 
-/* ---------- lấy thông tin hóa đơn ---------- */
-function field(text, label, from = 0) {
-  const re = new RegExp(label + "[ \\t]*:[ \\t]*([^\\r\\n]*)", "g");
-  re.lastIndex = from;
-  const m = re.exec(text);
-  if (!m) return { v: "", end: from };
-  let v = m[1]; const p = v.indexOf("   "); if (p >= 0) v = v.slice(0, p);
-  return { v: v.trim(), end: m.index + m[0].length };
+/* ---------- lấy thông tin hóa đơn (parser.mjs) + nhãn bổ sung ---------- */
+const LBL_IDS = { donvi: "lbDonvi", mst: "lbMst", tong: "lbTong" };
+function extraLabels() {
+  const o = {};
+  for (const [k, id] of Object.entries(LBL_IDS)) o[k] = $(id).value.split(",").map((x) => x.trim()).filter(Boolean);
+  return o;
 }
-function parseInvoice(text) {
-  const so = (text.match(/Số[ \t]*:\s*(\d{5,})/) || [])[1] || "";
-  const d = text.match(/Ngày\s+(\d{1,2})\s+tháng\s+(\d{1,2})\s+năm\s+(\d{4})/);
-  const dv = field(text, "Tên đơn vị");
-  let donvi = dv.v, mst = "";
-  if (donvi) mst = field(text, "Mã số thuế", dv.end).v.replace(/[^\d-]/g, "");
-  if (!donvi) donvi = field(text, "Họ tên người mua hàng").v;
-  return {
-    so, donvi, mst,
-    kyhieu: field(text, "Ký hiệu").v,
-    ngay: d ? `${d[1].padStart(2, "0")}-${d[2].padStart(2, "0")}-${d[3]}` : "",
-  };
+function parseInvoice(text) { return parseRaw(text, extraLabels()); }
+for (const id of Object.values(LBL_IDS)) {
+  try { const v = localStorage.getItem("tachpdf_" + id); if (v) $(id).value = v; } catch {}
+  $(id).addEventListener("input", () => { try { localStorage.setItem("tachpdf_" + id, $(id).value); } catch {} });
 }
+for (const id of ["optMoney", "optMerge"]) {
+  try { const v = localStorage.getItem("tachpdf_" + id); if (v !== null) $(id).checked = v === "1"; } catch {}
+  $(id).addEventListener("change", () => { try { localStorage.setItem("tachpdf_" + id, $(id).checked ? "1" : "0"); } catch {} });
+}
+const fmtMoney = (n) => (typeof n === "number" ? n.toLocaleString("vi-VN") : "");
 function makeName(tpl, info) {
   let s = tpl.replace(/\{(so|donvi|mst|kyhieu|ngay)\}/gi, (_, k) => info[k.toLowerCase()] || "");
   s = s.replace(/[\\/:*?"<>|\r\n\t]/g, " ").replace(/\s+/g, " ").trim().replace(/^[_\-. ]+|[_\-. ]+$/g, "");
@@ -261,30 +499,37 @@ function setStatus(msg, err = false) { $("status").textContent = msg; $("status"
 function setBar(p) { $("bar").style.width = Math.round(p * 100) + "%"; }
 function lock(on) {
   state.running = on;
-  $("btnTest").disabled = $("btnRun").disabled = on || !state.bytes;
+  $("btnTest").disabled = $("btnRun").disabled = on || !state.files.length;
   $("btnZip").disabled = on || !state.zipBlob;
+  $("btnXlsx").disabled = on || !state.xlsxBlob;
+  ["optMoney", "optMerge", ...Object.values(LBL_IDS)].forEach((id) => ($(id).disabled = on));
   $("btnStop").hidden = !on;
   $("tpl").disabled = on; $("sep").disabled = on;
   document.querySelectorAll(".opt").forEach((b) => (b.disabled = on));
 }
-async function pickFile(f) {
-  if (!f) return;
-  if (!/\.pdf$/i.test(f.name) && f.type !== "application/pdf") { setStatus("File không phải PDF. Hãy chọn file .pdf.", true); return; }
-  state.file = f; state.bytes = new Uint8Array(await f.arrayBuffer());
-  state.zipBlob = null; state.results = []; previewInfo = null; updatePreview();
-  $("fileName").textContent = `${f.name} · ${(f.size / 1048576).toFixed(1)} MB`;
+async function pickFiles(list) {
+  const fs = [...(list || [])].filter((f) => /\.pdf$/i.test(f.name) || f.type === "application/pdf");
+  if (!fs.length) { setStatus("Không có file PDF nào. Hãy chọn file .pdf.", true); return; }
+  fs.sort((a, b) => a.name.localeCompare(b.name, "vi", { numeric: true }));
+  state.files = [];
+  for (const f of fs) state.files.push({ name: f.name, bytes: new Uint8Array(await f.arrayBuffer()) });
+  state.zipBlob = state.xlsxBlob = null; state.results = []; state.checks = null; previewInfo = null; updatePreview();
+  const mb = fs.reduce((a, f) => a + f.size, 0) / 1048576;
+  const sz = `<span class="sz">· ${mb.toFixed(1).replace(".", ",")} MB</span>`;
+  $("fileName").innerHTML = fs.length === 1 ? `${esc(fs[0].name)} ${sz}`
+    : `${fs.length} file PDF ${sz} (${esc(fs.slice(0, 3).map((f) => f.name).join(", "))}${fs.length > 3 ? ", …" : ""})`;
   setStatus("Đã chọn file. Bấm \"Thử 10 hóa đơn đầu\" để kiểm tra trước.");
   setBar(0); lock(false);
 }
 const drop = $("drop");
 drop.addEventListener("click", () => $("fileInput").click());
 drop.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("fileInput").click(); } });
-$("fileInput").addEventListener("change", (e) => pickFile(e.target.files[0]));
+$("fileInput").addEventListener("change", (e) => pickFiles(e.target.files));
 ["dragenter", "dragover"].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add("over"); }));
 ["dragleave", "drop"].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove("over"); }));
-drop.addEventListener("drop", (e) => pickFile(e.dataTransfer.files[0]));
+drop.addEventListener("drop", (e) => pickFiles(e.dataTransfer.files));
 /* ---------- chọn thông tin đặt tên ---------- */
-const SAMPLE = { so: "00002597", donvi: "TRƯỜNG TIỂU HỌC AN HẠ", mst: "0307276287", ngay: "30-09-2022", kyhieu: "1C22TDK" };
+const SAMPLE = { so: "00000123", donvi: "CÔNG TY TNHH MẪU THỬ A", mst: "0123456789", ngay: "15-11-2026", kyhieu: "1C26TAA" };
 let picked = ["so", "donvi"];
 let previewInfo = null;
 function syncOpts() {
@@ -317,89 +562,489 @@ $("btnStop").addEventListener("click", () => { state.stop = true; setStatus("Đa
 $("btnTest").addEventListener("click", () => run(10));
 $("btnRun").addEventListener("click", () => run(0));
 $("btnZip").addEventListener("click", saveZip);
+$("btnXlsx").addEventListener("click", () => state.xlsxBlob && offerSave(outBase() + "_BangKe.xlsx", state.xlsxBlob));
 
 function esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
 function render() {
-  const rows = state.results.map((r, i) => `<tr class="${r.ok ? "" : "bad"}">
+  const rows = state.results.map((r, i) => `<tr class="${r.level === "bad" ? "bad" : r.level === "check" ? "check" : ""}">
     <td class="num">${i + 1}</td><td class="mono">${esc(r.so)}</td><td>${esc(r.donvi)}</td><td class="mono">${esc(r.mst)}</td>
-    <td class="num">${esc(r.trang)}</td><td class="mono">${esc(r.file)}</td>
+    <td class="money">${fmtMoney(r.tong)}</td><td class="num">${esc(r.trangHien)}</td><td class="mono">${esc(r.file)}</td>
     <td><span class="tag ${r.ok ? "ok" : "warn"}">${esc(r.msg)}</span></td>
-    <td><button class="linkbtn" type="button" data-i="${i}">Tải</button></td></tr>`).join("");
+    <td style="white-space:nowrap"><button class="linkbtn" type="button" data-view="${i}">Xem</button><button class="linkbtn" type="button" data-i="${i}">Tải</button></td></tr>`).join("");
   $("tbody").innerHTML = rows;
-  const bad = state.results.filter((r) => !r.ok).length;
-  $("summary").innerHTML = state.results.length
-    ? `<span class="pill">${state.results.length} hóa đơn</span><span class="pill ok">${state.results.length - bad} đạt</span>` +
-      (bad ? `<span class="pill warn">${bad} cần kiểm tra</span>` : "")
+  const n = state.results.length, bad = state.results.filter((r) => !r.ok).length;
+  const sum = state.results.reduce((a, r) => a + (typeof r.tong === "number" ? r.tong : 0), 0);
+  const outs = new Set(state.results.map((r) => r.file)).size;
+  $("summary").innerHTML = n
+    ? `<span class="pill">${n} hóa đơn</span>` + (outs !== n ? `<span class="pill">${outs} file sau khi gộp</span>` : "") +
+      (sum ? `<span class="pill">Tổng thanh toán: ${fmtMoney(sum)}</span>` : "") +
+      `<span class="pill ok">${n - bad} đạt</span>` + (bad ? `<span class="pill warn">${bad} cần kiểm tra</span>` : "")
     : "";
+  const c = state.checks;
+  if (c && c.items.length) {
+    $("checks").hidden = false;
+    $("checks").innerHTML = `<b>Kiểm tra trước khi gửi khách</b><ul>${c.items.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`;
+  } else $("checks").hidden = true;
 }
 $("tbody").addEventListener("click", (e) => {
   const b = e.target.closest(".linkbtn"); if (!b) return;
+  if (b.dataset.view !== undefined) {
+    const rv = state.results[+b.dataset.view];
+    if (rv) openViewer(rv.out.bytes, rv.file, () => offerSave(rv.file, new Blob([rv.out.bytes], { type: "application/pdf" })));
+    return;
+  }
   const r = state.results[+b.dataset.i];
-  if (r) offerSave(r.file, new Blob([r.bytes], { type: "application/pdf" }));
+  if (r) offerSave(r.file, new Blob([r.out.bytes], { type: "application/pdf" }));
 });
 
+/* ---------- OCR cho file scan (Tesseract.js, tải từ CDN khi cần) ---------- */
+const TESS_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";
+let ocrWorkers = null;
+function isImagePage(t) { return t.replace(/\s+/g, "").length < 30; }
+function loadScript(src) {
+  return new Promise((res, rej) => {
+    if (window.Tesseract) return res();
+    const sc = document.createElement("script");
+    sc.src = src; sc.onload = () => res();
+    sc.onerror = () => rej(new Error("Không tải được bộ OCR. Kiểm tra kết nối mạng rồi thử lại"));
+    document.head.appendChild(sc);
+  });
+}
+async function getOcrWorkers() {
+  if (ocrWorkers) return ocrWorkers;
+  await loadScript(TESS_URL);
+  const n = Math.max(1, Math.min(3, Math.floor((navigator.hardwareConcurrency || 2) / 2)));
+  const ws = [];
+  for (let k = 0; k < n; k++) {
+    setStatus(`Đang tải bộ OCR tiếng Việt (${k + 1}/${n})… lần đầu có thể mất 10–30 giây.`);
+    ws.push(await Promise.race([
+      Tesseract.createWorker("vie", 1),
+      new Promise((_, rej) => setTimeout(() => rej(new Error(
+        "Không tải được bộ OCR (quá 45 giây). Nếu bạn đang mở trang trong khung xem trước của Claude, OCR bị chặn ở đây, hãy mở trang trên GitHub Pages. Nếu đang mở trên web, kiểm tra kết nối mạng")), 45000)),
+    ]));
+  }
+  ocrWorkers = ws;
+  return ws;
+}
+async function ocrPage(worker, page, full) {
+  const vp = page.getViewport({ scale: 300 / 72 });
+  const c = document.createElement("canvas");
+  c.width = Math.floor(vp.width); c.height = Math.floor(vp.height * (full ? 1 : 0.45));   // đọc tiền thì OCR cả trang, không thì nửa trên
+  const ctx = c.getContext("2d");
+  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height);
+  await page.render({ canvasContext: ctx, viewport: vp }).promise;
+  await worker.setParameters({ tessedit_pageseg_mode: "3" });
+  let t = (await worker.recognize(c)).data.text;
+  if (!/\bso[ \t]*[:;.]?[ \t]*[0-9o]{6,}/.test(fold(t))) {          // không thấy Số HĐ -> thử chế độ chữ rời rạc
+    await worker.setParameters({ tessedit_pageseg_mode: "11" });
+    t += "\n" + (await worker.recognize(c)).data.text;
+  }
+  c.width = c.height = 0;
+  return t;
+}
+/* danh sách khách hàng: MST -> tên chuẩn */
+function normMST(s) { s = String(s).replace(/[^\d-]/g, ""); return /^\d{9}$/.test(s) ? "0" + s : s; }
+function readKH() {
+  const m = new Map();
+  for (const line of $("dskh").value.split(/\r?\n/)) {
+    const m2 = line.match(/^\s*'?([\d][\d .-]{7,17}\d)\s*[\t;,]?\s*(.+)$/);
+    if (!m2) continue;
+    const k = normMST(m2[1].replace(/[ .]/g, "")), v = m2[2].replace(/^[\t;, ]+/, "").trim();
+    if (k.length >= 10 && v) m.set(k, v);
+  }
+  return m;
+}
+function updateKH() {
+  const n = readKH().size;
+  $("khcount").textContent = n ? `${n} khách hàng trong danh sách.` : "Chưa có khách hàng nào.";
+  try { localStorage.setItem("tachpdf_dskh", $("dskh").value); } catch {}
+}
+try { const v = localStorage.getItem("tachpdf_dskh"); if (v) { $("dskh").value = v; $("khbox").open = true; } } catch {}
+$("dskh").addEventListener("input", updateKH);
+updateKH();
+
+/* ---------- Bản quyền: dùng thử theo số hóa đơn + mã kích hoạt gắn với Mã máy ---------- */
+const FREE_QUOTA = 50;                       // số hóa đơn được dùng thử miễn phí
+const PUB_KEY = {"kty": "EC", "x": "pUx8wyjxSTsTD432dCbYsjk3oeHjiOSmiFNde-mSKB8", "y": "TqP0S0TZm7wT30IHq8TwKDqNdSFP0aLxRol6_82IAaw", "crv": "P-256"};
+const LS = { mid: "tachpdf_mid", used: "tachpdf_used", key: "tachpdf_key" };
+const lic = { ok: false, info: null, mid: "", used: 0 };
+function lsGet(k) { try { return localStorage.getItem(k); } catch { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch {} }
+function lsDel(k) { try { localStorage.removeItem(k); } catch {} }
+function b64uToBytes(s) {
+  s = s.replace(/-/g, "+").replace(/_/g, "/"); while (s.length % 4) s += "=";
+  return Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+}
+function getMachineId() {
+  let m = lsGet(LS.mid);
+  if (!m || !/^M-[A-Z2-9]{4}-[A-Z2-9]{4}$/.test(m)) {
+    const A = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", r = crypto.getRandomValues(new Uint8Array(8));
+    const t = [...r].map((x) => A[x % A.length]).join("");
+    m = `M-${t.slice(0, 4)}-${t.slice(4)}`; lsSet(LS.mid, m);
+  }
+  return m;
+}
+async function verifyLicense(key, mid) {
+  const parts = String(key || "").trim().replace(/\s+/g, "").split(".");
+  if (parts.length !== 3 || parts[0] !== "TPDF1") throw new Error("Mã không đúng định dạng");
+  const pk = await crypto.subtle.importKey("jwk", PUB_KEY, { name: "ECDSA", namedCurve: "P-256" }, false, ["verify"]);
+  const good = await crypto.subtle.verify({ name: "ECDSA", hash: "SHA-256" }, pk, b64uToBytes(parts[2]), new TextEncoder().encode(parts[1]));
+  if (!good) throw new Error("Mã kích hoạt không hợp lệ");
+  const info = JSON.parse(new TextDecoder().decode(b64uToBytes(parts[1])));
+  if (info.m !== mid) throw new Error("Mã này dành cho máy khác (" + info.m + ")");
+  if (info.e && new Date(info.e + "T23:59:59") < new Date()) throw new Error("Mã đã hết hạn ngày " + info.e.split("-").reverse().join("/"));
+  return info;
+}
+function fmtDate(d) { return d ? d.split("-").reverse().join("/") : "vĩnh viễn"; }
+const KIND_OF_VIEW = { tach: "hd", nen: "nen", nhan: "nhan", che: "che", sosanh: "sosanh", chup: "chup" };
+const KIND_NAME = { hd: "Tách hóa đơn", nen: "Nén PDF", nhan: "Tách theo nhãn", che: "Che thông tin", sosanh: "So sánh 2 bản", chup: "Chụp giấy tờ" };
+const unitOf = (k) => (k === "hd" ? "hóa đơn" : k === "nen" ? "file" : "lần");
+function planText(d) {
+  if (!d) return "";
+  if (d.plan === "pro") return `Bản quyền: ${d.exp ? "đến " + fmtDate(d.exp) : "vĩnh viễn"} · đang dùng ${d.devices.used}/${d.devices.max} máy.` + (cloud.acct.offline ? " Đang mất kết nối máy chủ, vẫn dùng được trong vài ngày." : "");
+  if (d.plan === "device") return `Tài khoản có bản quyền nhưng đã dùng đủ ${d.devices.max} máy. Máy không mở app 30 ngày sẽ tự được gỡ, hoặc nhờ người bán xóa danh sách máy.`;
+  if (d.plan === "locked") return "Tài khoản đã bị khóa. " + (d.contact || "");
+  return (d.expired ? "Bản quyền đã hết hạn, đang ở chế độ dùng thử. " : "Đang dùng thử. ") + `Muốn dùng không giới hạn: gửi email trên cho người bán. ${d.contact || ""}`;
+}
+function trialSummary() {
+  return Object.keys(KIND_NAME).map((k) => `${KIND_NAME[k]} ${Math.min(freeOf(k) - leftOf(k), freeOf(k))}/${freeOf(k)}`).join(" · ");
+}
+function renderLic() {
+  const b = $("licBadge");
+  $("machineId").textContent = lic.mid;
+  const kind = KIND_OF_VIEW[window.__curView || "tach"] || "hd";
+  const keyPro = ALLOW_OFFLINE_KEY && lic.ok;
+  $("oldKey").hidden = !ALLOW_OFFLINE_KEY;
+  $("oldKey").classList.toggle("solo", !cloud.CLOUD); if (!cloud.CLOUD) $("oldKey").open = true;
+  $("btnRemoveLic").hidden = !lic.ok;
+  $("acctBox").hidden = !cloud.CLOUD;
+  const d = cloud.acct.data, inn = cloud.CLOUD && cloud.loggedIn();
+  if (cloud.CLOUD) {
+    $("acctOut").hidden = inn; $("acctIn").hidden = !inn;
+    if (inn) { $("acctEmail").textContent = d.email; $("acctPlan").textContent = planText(d); }
+  }
+  if (proActive()) {
+    b.textContent = "✓ Bản quyền: " + (keyPro ? lic.info.n : (d.name || d.email)); b.classList.add("on");
+    $("licTitle").textContent = "Đã kích hoạt bản quyền";
+    $("licInfo").textContent = keyPro ? `Cấp cho: ${lic.info.n} · Hạn dùng: ${fmtDate(lic.info.e)} · Không giới hạn số hóa đơn.` : "Dùng không giới hạn tất cả công cụ.";
+    return;
+  }
+  b.classList.remove("on");
+  if (cloud.CLOUD && !inn) {
+    b.textContent = "Đăng nhập để dùng thử";
+    $("licTitle").textContent = "Đăng nhập để dùng thử";
+    $("licInfo").textContent = `Miễn phí: tách ${FREE.hd} hóa đơn, nén ${FREE.nen} file, các công cụ khác mỗi công cụ ${FREE.nhan} lần.`;
+  } else if (cloud.CLOUD && d && (d.plan === "device" || d.plan === "locked")) {
+    b.textContent = d.plan === "device" ? "Vượt số máy cho phép" : "Tài khoản bị khóa";
+    $("licTitle").textContent = "Không dùng được bản quyền trên máy này";
+    $("licInfo").textContent = planText(d);
+  } else if (cloud.CLOUD && cloud.acct.offline) {
+    b.textContent = "Mất kết nối máy chủ";
+    $("licTitle").textContent = "Không kết nối được máy chủ bản quyền";
+    $("licInfo").textContent = "Bản dùng thử cần có mạng để kiểm tra lượt còn lại. Kiểm tra kết nối rồi mở lại trang.";
+  } else {
+    const l = leftOf(kind), f = freeOf(kind);
+    b.textContent = l > 0 ? `Dùng thử: còn ${l}/${f} ${unitOf(kind)}` : "Hết lượt dùng thử – Kích hoạt";
+    $("licTitle").textContent = "Kích hoạt bản quyền";
+    $("licInfo").textContent = "Đã dùng thử: " + trialSummary() + "." + (cloud.CLOUD ? "" : " Kích hoạt để dùng không giới hạn.");
+  }
+}
+function toggleLic(open) {
+  const p = $("licPanel"); p.hidden = open === undefined ? !p.hidden : !open;
+  $("licBadge").setAttribute("aria-expanded", String(!p.hidden));
+}
+function licMsg(t, kind) { $("licMsg").textContent = t; $("licMsg").className = "licmsg " + (kind || ""); }
+async function initLic() {
+  lic.mid = getMachineId();
+  lic.used = parseInt(lsGet(LS.used) || "0", 10) || 0;
+  const k = lsGet(LS.key);
+  if (k && ALLOW_OFFLINE_KEY) {
+    try { lic.info = await verifyLicense(k, lic.mid); lic.ok = true; }
+    catch (e) { lic.ok = false; licMsg("Mã đã lưu không còn dùng được: " + e.message, "err"); }
+  }
+  renderLic();
+  if (cloud.CLOUD) {
+    if (cloud.loggedIn()) { await cloud.refresh(lic.mid, 0); renderLic(); }
+    if (!cloud.loggedIn()) showLoginButton();
+  }
+}
+function showLoginButton() {
+  cloud.renderLoginButton($("gsiBtn"), lic.mid,
+    (d) => { licMsg(`Đã đăng nhập: ${d.email}.`, "ok"); renderLic(); },
+    (m) => licMsg(m, "err"));
+}
+$("btnLogout").addEventListener("click", () => { cloud.logout(); licMsg("Đã đăng xuất.", "ok"); renderLic(); showLoginButton(); });
+$("licBadge").addEventListener("click", () => toggleLic());
+$("btnCopyMid").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(lic.mid); licMsg("Đã sao chép Mã máy.", "ok"); }
+  catch { licMsg("Không sao chép được, hãy bôi đen Mã máy rồi Ctrl+C.", "err"); }
+});
+$("btnActivate").addEventListener("click", async () => {
+  try {
+    lic.info = await verifyLicense($("licKey").value, lic.mid);
+    lic.ok = true; lsSet(LS.key, $("licKey").value.trim().replace(/\s+/g, ""));
+    $("licKey").value = ""; licMsg("Kích hoạt thành công. Cảm ơn bạn!", "ok"); renderLic();
+  } catch (e) { licMsg(e.message + ".", "err"); }
+});
+$("btnRemoveLic").addEventListener("click", () => {
+  lsDel(LS.key); lic.ok = false; lic.info = null; licMsg("Đã gỡ mã kích hoạt trên máy này.", "ok"); renderLic();
+});
+/* ---------- lượt dùng thử: một chỗ cho mọi công cụ ---------- */
+const FREE = { hd: FREE_QUOTA, nen: 3, nhan: 3, che: 3, sosanh: 3, chup: 3 };     // khi chưa nối máy chủ
+const LOCAL_KEY = { hd: LS.used, nen: "tachpdf_nen", nhan: "tachpdf_t_nhan", che: "tachpdf_t_che", sosanh: "tachpdf_t_sosanh", chup: "tachpdf_t_chup" };
+const localUsed = (k) => parseInt(lsGet(LOCAL_KEY[k]) || "0", 10) || 0;
+function proActive() { return (ALLOW_OFFLINE_KEY && lic.ok) || (cloud.CLOUD && cloud.isPro()); }
+function leftOf(kind) {
+  if (proActive()) return Infinity;
+  if (cloud.CLOUD) return cloud.left(kind);
+  return Math.max(0, FREE[kind] - localUsed(kind));
+}
+function freeOf(kind) { return cloud.CLOUD ? (cloud.freeOf(kind) || FREE[kind]) : FREE[kind]; }
+function openLic() { toggleLic(true); window.scrollTo({ top: 0, behavior: "smooth" }); }
+/* Kiểm tra trước khi chạy: trả về true nếu được phép */
+async function ensure(kind, say) {
+  if (ALLOW_OFFLINE_KEY && lic.ok) return true;
+  if (cloud.CLOUD) {
+    if (!cloud.loggedIn()) { say("Hãy đăng nhập Google để dùng thử miễn phí (nút đăng nhập ở khung phía trên).", true); renderLic(); openLic(); return false; }
+    say("Đang kiểm tra bản quyền…");
+    await cloud.refresh(lic.mid, cloud.isPro() ? 6 * 3600000 : 0);      // bản quyền: kiểm tra lại mỗi 6 giờ
+    renderLic();
+    if (!cloud.loggedIn()) { say("Phiên đăng nhập đã hết hạn, hãy đăng nhập lại.", true); showLoginButton(); openLic(); return false; }
+    const d = cloud.acct.data;
+    if (d.plan === "locked" || d.plan === "device") { say(planText(d), true); openLic(); return false; }
+    if (cloud.acct.offline && !cloud.isPro()) { say("Không kết nối được máy chủ bản quyền. Bản dùng thử cần có mạng, kiểm tra kết nối rồi thử lại.", true); return false; }
+  }
+  if (leftOf(kind) > 0) return true;
+  say(`Bạn đã dùng hết ${freeOf(kind)} ${unitOf(kind)} miễn phí của ${KIND_NAME[kind]}. Hãy kích hoạt bản quyền để tiếp tục.`, true);
+  openLic(); return false;
+}
+/* Ghi nhận đã dùng n lượt (sau khi chạy xong) */
+async function consume(kind, n) {
+  if (!n || (ALLOW_OFFLINE_KEY && lic.ok)) return;
+  if (cloud.CLOUD) { try { await cloud.use(lic.mid, kind, n); } catch (e) { console.warn(e); } renderLic(); return; }
+  lsSet(LOCAL_KEY[kind], String(localUsed(kind) + n));
+  if (kind === "hd") lic.used = localUsed("hd");
+  renderLic();
+}
+initLic();
+
 /* ---------- xử lý ---------- */
+const MONEY_KEYS = ["tienhang", "thue", "tong", "thuesuat"];
+async function readFile(fi, file, groups, limit, t0, wantMoney) {
+  const task = pdfjsLib.getDocument({ data: file.bytes.slice() });
+  const pdf = await task.promise;
+  const total = pdf.numPages;
+  const tag = state.files.length > 1 ? `file ${fi + 1}/${state.files.length}, ` : "";
+  let first = true;
+  const feed = (info, idx, ocr) => {
+    const last = groups[groups.length - 1];
+    const isNew = first || !last || (info.so ? info.so !== last.info.so : info.coNguoiMua);
+    first = false;
+    if (isNew) {
+      if (limit && groups.length >= limit) return false;
+      groups.push({ info, fi, pages: [idx - 1], ocr });
+    } else {
+      last.pages.push(idx - 1);
+      for (const k of MONEY_KEYS) if (info[k] !== null && info[k] !== "" && info[k] !== undefined) last.info[k] = info[k];
+      if (ocr) last.ocr = true;
+    }
+    return true;
+  };
+  let i = 1, go = true, ocrCount = 0;
+  while (go && i <= total && !state.stop) {
+    const page = await pdf.getPage(i);
+    const txt = await pageLines(page);
+    if (!isImagePage(txt)) {
+      go = feed(parseInvoice(txt), i, false);
+      page.cleanup(); i++;
+    } else {
+      const workers = await getOcrWorkers();
+      const batch = [{ idx: i, page }];
+      let j = i + 1;
+      while (batch.length < workers.length && j <= total) {
+        const p2 = await pdf.getPage(j);
+        if (!isImagePage(await pageLines(p2))) { p2.cleanup(); break; }
+        batch.push({ idx: j, page: p2 }); j++;
+      }
+      const sec = Math.round((Date.now() - t0) / 1000);
+      setStatus(`Đang OCR trang ${i}${batch.length > 1 ? "–" + (j - 1) : ""}/${total} (${tag}file scan, ${sec}s)…`);
+      const texts = await Promise.all(batch.map((b, k) => ocrPage(workers[k], b.page, wantMoney)));
+      for (let k = 0; k < batch.length; k++) {
+        if (go) go = feed(parseInvoice(texts[k]), batch[k].idx, true);
+        batch[k].page.cleanup();
+      }
+      ocrCount += batch.length; i = j;
+    }
+    setBar(0.5 * ((fi + (i - 1) / total) / state.files.length));
+    if ((i - 1) % 5 === 0 || i > total) { if (!ocrCount) setStatus(`Đang đọc ${tag}trang ${i - 1}/${total}…`); await new Promise((r) => setTimeout(r)); }
+  }
+  await task.destroy();
+  return go;
+}
+
+/* Kiểm tra lỗi: trùng số HĐ, MST sai định dạng, số HĐ nhảy cách, tiền lệch */
+function runChecks(results) {
+  const items = [], rowWarn = new Map();
+  const warn = (r, t) => { if (!rowWarn.has(r)) rowWarn.set(r, []); rowWarn.get(r).push(t); };
+  // Ký hiệu bị OCR bỏ sót -> quy về dãy ký hiệu phổ biến nhất
+  const cnt = new Map();
+  results.forEach((r) => r.kyhieu && cnt.set(r.kyhieu, (cnt.get(r.kyhieu) || 0) + 1));
+  const mainSeries = [...cnt.entries()].sort((x, y) => y[1] - x[1])[0]?.[0] || "";
+  const seriesOf = (r) => r.kyhieu || mainSeries;
+  const byKey = new Map();
+  results.forEach((r) => { if (!r.so) return; const k = seriesOf(r) + "|" + r.so; if (!byKey.has(k)) byKey.set(k, []); byKey.get(k).push(r); });
+  const dups = [...byKey.values()].filter((a) => a.length > 1);
+  if (dups.length) {
+    items.push(`Trùng số hóa đơn: ${dups.slice(0, 10).map((a) => `${a[0].so} (${a.length} lần)`).join(", ")}${dups.length > 10 ? "…" : ""}`);
+    dups.flat().forEach((r) => warn(r, "trùng số HĐ"));
+  }
+  const badMst = results.filter((r) => r.mst && !/^\d{10}(-\d{3})?$/.test(r.mst));
+  if (badMst.length) {
+    items.push(`MST sai định dạng (phải 10 số hoặc 10 số-3 số): ${badMst.slice(0, 8).map((r) => `${r.so} → ${r.mst}`).join("; ")}${badMst.length > 8 ? "…" : ""}`);
+    badMst.forEach((r) => warn(r, "MST sai định dạng"));
+  }
+  const bySeries = new Map();
+  results.forEach((r) => { if (!/^\d+$/.test(r.so || "")) return; const k = seriesOf(r) || "(không ký hiệu)"; if (!bySeries.has(k)) bySeries.set(k, new Set()); bySeries.get(k).add(parseInt(r.so, 10)); });
+  for (const [k, set] of bySeries) {
+    const nums = [...set].sort((a, b) => a - b), gaps = [];
+    let missing = 0;
+    for (let x = 1; x < nums.length; x++) {
+      const d = nums[x] - nums[x - 1];
+      if (d > 1 && d <= 1000) { missing += d - 1; gaps.push(d === 2 ? `${nums[x - 1] + 1}` : `${nums[x - 1] + 1}–${nums[x] - 1}`); }
+    }
+    if (missing) items.push(`Ký hiệu ${k}: thiếu ${missing} số hóa đơn trong dãy (${gaps.slice(0, 8).join(", ")}${gaps.length > 8 ? "…" : ""}). Kiểm tra xem có sót trang không.`);
+  }
+  const off = results.filter((r) => typeof r.tienhang === "number" && typeof r.tong === "number" && Math.abs(r.tienhang + (r.thue || 0) - r.tong) > 1);
+  if (off.length) {
+    items.push(`Tiền hàng + thuế khác tổng thanh toán: ${off.slice(0, 8).map((r) => r.so).join(", ")}${off.length > 8 ? "…" : ""} (có thể do chiết khấu hoặc đọc nhầm, nên mở file xem lại).`);
+    off.forEach((r) => warn(r, "tiền lệch"));
+  }
+  return { items, rowWarn };
+}
+
+function outBase() {
+  if (state.files.length === 1) return state.files[0].name.replace(/\.pdf$/i, "").replace(/[\\/:*?"<>|]/g, " ");
+  return `HoaDon_${state.files.length}file`;
+}
+
 async function run(limit) {
-  if (!state.bytes || state.running) return;
-  state.stop = false; state.zipBlob = null; state.results = []; render(); lock(true); setBar(0);
+  if (!state.files.length || state.running) return;
+  state.stop = false; state.zipBlob = state.xlsxBlob = null; state.results = []; state.checks = null; render(); lock(true); setBar(0);
   const tpl = $("tpl").value.trim();
   if (!tpl) { setStatus("Hãy chọn ít nhất một thông tin để đặt tên file.", true); lock(false); return; }
+  if (!(await ensure("hd", setStatus))) { lock(false); return; }
+  const quota = leftOf("hd");
+  const userLimit = limit;
+  if (quota !== Infinity && (!limit || quota < limit)) limit = quota;
+  const wantMoney = $("optMoney").checked, merge = $("optMerge").checked;
   try {
-    setStatus("Đang mở file…");
-    const task = pdfjsLib.getDocument({ data: state.bytes.slice() });
-    const pdf = await task.promise;
-    const total = pdf.numPages;
+    const t0 = Date.now();
     const groups = [];
-    for (let i = 1; i <= total; i++) {
-      if (state.stop) break;
-      const page = await pdf.getPage(i);
-      const info = parseInvoice(await pageLines(page));
-      page.cleanup();
-      const last = groups[groups.length - 1];
-      if (!last || (info.so && info.so !== last.info.so)) {
-        if (limit && groups.length >= limit) break;
-        groups.push({ info, pages: [i - 1] });
-      } else last.pages.push(i - 1);
-      if (i % 5 === 0 || i === total) { setBar(0.5 * i / total); setStatus(`Đang đọc trang ${i}/${total}…`); await new Promise((r) => setTimeout(r)); }
+    for (let fi = 0; fi < state.files.length && !state.stop; fi++) {
+      setStatus(state.files.length > 1 ? `Đang mở file ${fi + 1}/${state.files.length}: ${state.files[fi].name}…` : "Đang mở file…");
+      const go = await readFile(fi, state.files[fi], groups, limit, t0, wantMoney);
+      if (!go) break;
     }
-    await task.destroy();
     if (!groups.length || groups.every((g) => !g.info.so && !g.info.donvi)) {
-      setStatus("Không đọc được chữ trong file. Có thể đây là file scan dạng ảnh.", true); lock(false); return;
+      setStatus("Không đọc được thông tin hóa đơn trong file. Kiểm tra lại file, hoặc thêm nhãn trong Tùy chỉnh nâng cao.", true); lock(false); return;
     }
 
-    setStatus("Đang tách file…");
-    const src = await PDFLib.PDFDocument.load(state.bytes, { ignoreEncryption: true, updateMetadata: false });
-    const used = new Map(); const zip = new JSZip(); const csv = [["Số HĐ", "Tên đơn vị", "MST", "Trang", "Tên file", "Trạng thái"]];
-    for (let g = 0; g < groups.length; g++) {
-      if (state.stop) break;
-      const { info, pages } = groups[g];
-      let name = makeName(tpl, info);
+    // tra tên chuẩn + trạng thái từng hóa đơn
+    const kh = readKH();
+    const multi = state.files.length > 1;
+    const results = groups.map((g) => {
+      const info = { ...g.info };
+      const found = !!(info.mst && kh.has(normMST(info.mst)));
+      if (found) info.donvi = kh.get(normMST(info.mst));
+      let level = "ok", msg = g.ocr ? "OK (OCR)" : "OK";
+      if (!(info.so && info.donvi)) { level = "bad"; msg = "Thiếu thông tin"; }
+      else if (g.ocr && !info.mst) { level = "check"; msg = "OCR – không có MST, kiểm tra tên"; }
+      else if (g.ocr && kh.size && !found) { level = "bad"; msg = "OCR – MST không có trong danh sách"; }
+      else if (g.ocr && !found) { level = "check"; msg = "OCR – nên kiểm tra tên"; }
+      const p = g.pages, trang = p.length > 1 ? `${p[0] + 1}-${p[p.length - 1] + 1}` : String(p[0] + 1);
+      return { ...info, g, level, msg, trang, nguon: state.files[g.fi].name,
+        trangHien: multi ? `#${g.fi + 1}: ${trang}` : trang };
+    });
+
+    // kiểm tra lỗi
+    const checks = runChecks(results);
+    for (const [r, ws] of checks.rowWarn) {
+      r.msg = (r.level === "ok" ? "" : r.msg + "; ") + ws.join(", ");
+      if (r.level === "ok") r.level = "check";
+    }
+    results.forEach((r) => (r.ok = r.level === "ok"));
+
+    // nhóm thành file đầu ra
+    const outs = [];
+    if (merge) {
+      const map = new Map();
+      for (const r of results) {
+        const key = r.mst ? "m:" + normMST(r.mst) : r.donvi ? "n:" + fold(r.donvi).replace(/\s+/g, " ").trim() : "x:" + outs.length + Math.random();
+        if (!map.has(key)) { const o = { items: [] }; map.set(key, o); outs.push(o); }
+        map.get(key).items.push(r);
+      }
+    } else results.forEach((r) => outs.push({ items: [r] }));
+    const used = new Map();
+    for (const o of outs) {
+      const r0 = o.items[0];
+      let name = o.items.length > 1
+        ? makeName(tpl, { ...r0, so: "", ngay: "" }) + ` (${o.items.length} HĐ)`
+        : makeName(tpl, r0);
       const k = name.toLowerCase(); const n = (used.get(k) || 0) + 1; used.set(k, n);
       if (n > 1) name += ` (${n})`;
+      o.name = name + ".pdf";
+      o.items.forEach((r) => { r.file = o.name; r.out = o; });
+    }
+
+    // ghi file PDF
+    setStatus("Đang tách file…");
+    const srcDocs = new Map();
+    const getSrc = async (fi) => {
+      if (!srcDocs.has(fi)) srcDocs.set(fi, await PDFLib.PDFDocument.load(state.files[fi].bytes, { ignoreEncryption: true, updateMetadata: false }));
+      return srcDocs.get(fi);
+    };
+    const zip = new JSZip();
+    for (let x = 0; x < outs.length; x++) {
+      if (state.stop) break;
+      const o = outs[x];
       const doc = await PDFLib.PDFDocument.create();
-      (await doc.copyPages(src, pages)).forEach((p) => doc.addPage(p));
-      const bytes = await doc.save();
-      const ok = !!(info.so && info.donvi);
-      const r = {
-        ...info, bytes, ok, file: name + ".pdf", msg: ok ? "OK" : "Thiếu thông tin",
-        trang: pages.length > 1 ? `${pages[0] + 1}-${pages[pages.length - 1] + 1}` : String(pages[0] + 1),
-      };
-      state.results.push(r);
-      zip.file(r.file, bytes, { binary: true });
-      csv.push([r.so, r.donvi, r.mst, r.trang, r.file, r.msg]);
-      if (g % 10 === 0 || g === groups.length - 1) {
-        setBar(0.5 + 0.45 * (g + 1) / groups.length); setStatus(`Đang tách ${g + 1}/${groups.length}…`);
+      for (const r of o.items) (await doc.copyPages(await getSrc(r.g.fi), r.g.pages)).forEach((pg) => doc.addPage(pg));
+      o.bytes = await doc.save();
+      zip.file(o.name, o.bytes, { binary: true });
+      if (x % 10 === 0 || x === outs.length - 1) {
+        setBar(0.5 + 0.4 * (x + 1) / outs.length); setStatus(`Đang tách ${x + 1}/${outs.length}…`);
         await new Promise((r) => setTimeout(r));
       }
     }
-    zip.file("DanhSach.csv", "﻿" + csv.map((row) => row.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\r\n"));
+    state.results = results.filter((r) => r.out.bytes);
+    state.checks = checks;
+
+    // bảng kê Excel
+    setStatus("Đang lập bảng kê Excel…");
+    const cols = [
+      { header: "STT", width: 6, type: "int" }, { header: "Ký hiệu", width: 11, type: "text" }, { header: "Số HĐ", width: 11, type: "text" },
+      { header: "Ngày HĐ", width: 11, type: "text" }, { header: "MST người mua", width: 16, type: "text" }, { header: "Tên đơn vị", width: 42 },
+      { header: "Tiền hàng", width: 15, type: "money" }, { header: "Thuế suất", width: 9, type: "text" }, { header: "Tiền thuế", width: 13, type: "money" },
+      { header: "Tổng thanh toán", width: 16, type: "money" }, { header: "File gốc", width: 28 }, { header: "Trang", width: 8, type: "text" },
+      { header: "Tên file", width: 42 }, { header: "Trạng thái", width: 30 },
+    ];
+    const rowsX = state.results.map((r, i) => [i + 1, r.kyhieu, r.so, r.ngay ? r.ngay.replace(/-/g, "/") : "", r.mst, r.donvi,
+      r.tienhang, r.thuesuat, r.thue, r.tong, r.nguon, r.trang, r.file, r.msg]);
+    const sheets = [{ name: "Bảng kê", cols, rows: rowsX, totals: wantMoney ? [6, 8, 9] : null }];
+    if (checks.items.length) sheets.push({ name: "Kiểm tra", cols: [{ header: "Cảnh báo", width: 120 }], rows: checks.items.map((t) => [t]) });
+    state.xlsxBlob = await buildXlsx(sheets);
+    zip.file(outBase() + "_BangKe.xlsx", state.xlsxBlob);
+
     setStatus("Đang nén ZIP…");
     state.zipBlob = await zip.generateAsync({ type: "blob", compression: "STORE" });
+    await consume("hd", state.results.length);
     setBar(1); render();
     if (state.results[0]) { previewInfo = state.results[0]; updatePreview(); }
     const bad = state.results.filter((r) => !r.ok).length;
-    setStatus((state.stop ? "Đã dừng. " : "") + `Xong ${state.results.length} hóa đơn${limit ? " (chạy thử)" : ""}.` +
-      (bad ? ` ${bad} dòng cần kiểm tra.` : "") + " Bấm \"Tải ZIP kết quả\" để lưu.");
+    const trialCut = !proActive() && limit !== userLimit && state.results.length >= limit;
+    setStatus((state.stop ? "Đã dừng. " : "") + `Xong ${state.results.length} hóa đơn${outs.length !== state.results.length ? ` → ${outs.length} file` : ""}${userLimit ? " (chạy thử)" : ""}.` +
+      (trialCut ? ` Đã hết lượt dùng thử nên chỉ tách ${state.results.length} hóa đơn đầu, kích hoạt bản quyền để tách toàn bộ.` : "") +
+      (bad ? ` ${bad} dòng cần kiểm tra.` : "") + " Bấm \"Tải ZIP kết quả\" hoặc \"Tải bảng kê Excel\" để lưu.");
   } catch (err) {
     console.error(err);
     setStatus("Lỗi khi xử lý: " + (err && err.message ? err.message : err) + ". Thử lại với file khác hoặc báo lỗi kèm file mẫu.", true);
@@ -433,10 +1078,258 @@ async function offerSave(filename, blob) {
 }
 function saveZip() {
   if (!state.zipBlob) return;
-  const base = (state.file ? state.file.name.replace(/\.pdf$/i, "") : "HoaDon").replace(/[\\/:*?"<>|]/g, " ");
-  offerSave(`${base}_tach.zip`, state.zipBlob);
+  offerSave(`${outBase()}_tach.zip`, state.zipBlob);
 }
 getDownloads();
+
+/* ---------- xem PDF ngay trong ứng dụng ---------- */
+const V = { task: null, pdf: null, zoom: 1, onSave: null, obs: null, lastFocus: null, gen: 0 };
+async function openViewer(bytes, title, onSave) {
+  closeViewer(true);
+  V.lastFocus = document.activeElement; V.onSave = onSave; V.zoom = 1;
+  $("vTitle").textContent = title; $("vInfo").textContent = "Đang mở…"; $("vBody").innerHTML = "";
+  $("viewer").hidden = false; document.body.style.overflow = "hidden"; $("vClose").focus();
+  const gen = ++V.gen;
+  try {
+    V.task = pdfjsLib.getDocument({ data: bytes.slice() });
+    V.pdf = await V.task.promise;
+    if (gen !== V.gen) return;
+    $("vInfo").textContent = `${V.pdf.numPages} trang`;
+    await layoutViewer();
+  } catch (e) { console.error(e); $("vInfo").textContent = "Không mở được file: " + (e.message || e); }
+}
+async function layoutViewer() {
+  const pdf = V.pdf; if (!pdf) return;
+  if (V.obs) V.obs.disconnect();
+  const body = $("vBody"); body.innerHTML = "";
+  const first = await pdf.getPage(1);
+  const base = first.getViewport({ scale: 1 });
+  const fitW = Math.min(body.clientWidth - 24, 900);
+  const cssScale = (fitW / base.width) * V.zoom;
+  V.obs = new IntersectionObserver((ents) => ents.forEach((en) => { if (en.isIntersecting) { V.obs.unobserve(en.target); drawViewerPage(en.target, cssScale); } }), { root: body, rootMargin: "600px 0px" });
+  for (let n = 1; n <= pdf.numPages; n++) {
+    const pg = n === 1 ? first : await pdf.getPage(n);
+    const vp = pg.getViewport({ scale: cssScale });
+    const box = document.createElement("div");
+    box.className = "vpage"; box.dataset.n = n;
+    box.style.width = Math.round(vp.width) + "px"; box.style.height = Math.round(vp.height) + "px";
+    box.innerHTML = `<span class="vnum">${n}/${pdf.numPages}</span>`;
+    body.appendChild(box); V.obs.observe(box);
+  }
+}
+async function drawViewerPage(box, cssScale) {
+  if (!V.pdf) return;
+  const page = await V.pdf.getPage(+box.dataset.n);
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const vp = page.getViewport({ scale: cssScale * dpr });
+  const c = document.createElement("canvas");
+  c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+  c.style.width = box.style.width; c.style.height = box.style.height;
+  const ctx = c.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height);
+  await page.render({ canvasContext: ctx, viewport: vp }).promise;
+  box.prepend(c);
+}
+function closeViewer(silent) {
+  V.gen++;
+  if (V.obs) { V.obs.disconnect(); V.obs = null; }
+  if (V.task) { V.task.destroy(); V.task = null; } V.pdf = null;
+  $("vBody").innerHTML = ""; $("viewer").hidden = true; document.body.style.overflow = "";
+  if (!silent && V.lastFocus) try { V.lastFocus.focus(); } catch {}
+}
+$("vClose").addEventListener("click", () => closeViewer());
+$("vSave").addEventListener("click", () => V.onSave && V.onSave());
+$("vZoomIn").addEventListener("click", () => { V.zoom = Math.min(3, V.zoom * 1.25); layoutViewer(); });
+$("vZoomOut").addEventListener("click", () => { V.zoom = Math.max(0.4, V.zoom / 1.25); layoutViewer(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("viewer").hidden) closeViewer(); });
+$("viewer").addEventListener("click", (e) => { if (e.target === $("vBody")) closeViewer(); });
+
+/* ---------- chuyển công cụ ---------- */
+const VIEWS = {
+  tach: { el: "viewTach", tab: "tabTach", hash: "#tach-hoa-don", title: 'Tách hóa đơn PDF <span>theo tên đơn vị</span>', sub: 'Thả file PDF gồm nhiều hóa đơn. Mỗi hóa đơn được tách thành một file riêng, đặt tên theo dòng "Tên đơn vị" in trên hóa đơn, rồi tải về một file ZIP.' },
+  nen: { el: "viewNen", tab: "tabNen", hash: "#nen-pdf", title: 'Nén PDF <span>mà chữ vẫn rõ</span>', sub: "Giảm dung lượng file scan để gửi email, nộp hồ sơ online. Tự chọn mức nét nhất mà vẫn dưới dung lượng cho phép." },
+  nhan: { el: "viewNhan", tab: "tabNhan", hash: "#tach-theo-nhan", title: 'Tách PDF <span>theo nhãn tự chọn</span>', sub: "Tách phiếu lương, giấy báo, chứng chỉ… thành từng file, đặt tên theo nội dung in trên trang như \"Họ và tên\", \"Mã nhân viên\"." },
+  che: { el: "viewChe", tab: "tabChe", hash: "#che-thong-tin", title: 'Che thông tin <span>nhạy cảm</span>', sub: "Tự tìm và che số CCCD, số điện thoại, số tài khoản, email trước khi gửi file ra ngoài. Phần bị che được xóa hẳn khỏi file." },
+  sosanh: { el: "viewSoSanh", tab: "tabSoSanh", hash: "#so-sanh", title: 'So sánh <span>2 phiên bản tài liệu</span>', sub: "Đặt bản cũ và bản mới cạnh nhau, tô màu chỗ thêm, bớt, sửa. Hợp để rà hợp đồng, báo giá, văn bản trước khi ký." },
+  chup: { el: "viewChup", tab: "tabChup", hash: "#chup-giay-to", title: 'Chụp giấy tờ <span>thành PDF</span>', sub: "Chụp bằng điện thoại, tool tự cắt mép, làm phẳng, làm rõ chữ và ghép thành file PDF. Không watermark, không tải ảnh lên mạng." },
+};
+function viewFromHash() { for (const [k, v] of Object.entries(VIEWS)) if (location.hash === v.hash) return k; return "tach"; }
+function showView(v, push) {
+  if (!VIEWS[v]) v = "tach";
+  window.__curView = v; try { renderLic(); } catch {}
+  for (const [k, x] of Object.entries(VIEWS)) { $(x.el).hidden = k !== v; $(x.tab).setAttribute("aria-selected", String(k === v)); }
+  $("appTitle").innerHTML = VIEWS[v].title; $("appSub").textContent = VIEWS[v].sub;
+  if (push && location.hash !== VIEWS[v].hash) { try { history.replaceState(null, "", VIEWS[v].hash); } catch {} }
+  const t = $(VIEWS[v].tab); if (t.scrollIntoView) t.scrollIntoView({ block: "nearest", inline: "nearest" });
+}
+document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => showView(t.dataset.view, true)));
+window.addEventListener("hashchange", () => showView(viewFromHash()));
+showView(viewFromHash());
+
+/* ---------- lượt dùng thử chung cho các công cụ mới ---------- */
+const trialAllow = (key, say) => ensure(key, say);
+const trialUse = (key) => consume(key, 1);
+const trialLeft = (key) => leftOf(key);
+const TOOL_DEPS = () => ({ pdfjsLib, $, esc, pageLines, isImagePage, getOcrWorkers, ocrPage, fold, offerSave, openViewer, fmtMB, trialAllow, trialUse, trialLeft, buildXlsx });
+
+/* ---------- Nén PDF ---------- */
+const NEN_FREE = 3;                                  // số lần nén miễn phí khi chưa kích hoạt
+const nen = { file: null, bytes: null, out: null, mode: "auto", running: false, stop: false, res: null };
+const fmtMB = (b) => (b / 1048576).toFixed(b < 10 * 1048576 ? 2 : 1).replace(".", ",") + " MB";
+function nenUsed() { return parseInt(lsGet("tachpdf_nen") || "0", 10) || 0; }
+function nenStatus(t, err) { $("nenStatus").textContent = t; $("nenStatus").className = "status" + (err ? " err" : ""); }
+function nenLock(on) {
+  nen.running = on;
+  $("btnNen").disabled = on || !nen.bytes; $("btnNenSave").disabled = $("btnNenView").disabled = on || !nen.out;
+  $("btnNenStop").hidden = !on; $("nenTarget").disabled = on; $("nenCustom").disabled = on;
+  document.querySelectorAll(".mode").forEach((b) => (b.disabled = on));
+}
+async function pickNen(f) {
+  if (!f) return;
+  if (!/\.pdf$/i.test(f.name) && f.type !== "application/pdf") { nenStatus("File không phải PDF. Hãy chọn file .pdf.", true); return; }
+  nen.file = f; nen.bytes = new Uint8Array(await f.arrayBuffer()); nen.out = null; nen.res = null;
+  $("nenFileName").innerHTML = `${esc(f.name)} <span class="sz">· ${fmtMB(f.size)}</span>`;
+  $("nenResult").hidden = true; $("nenBar").style.width = "0%";
+  nenStatus("Đã chọn file. Chọn kiểu nén, dung lượng tối đa rồi bấm \"Nén PDF\".");
+  nenLock(false);
+}
+const dropNen = $("dropNen");
+dropNen.addEventListener("click", () => $("nenInput").click());
+dropNen.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("nenInput").click(); } });
+$("nenInput").addEventListener("change", (e) => pickNen(e.target.files[0]));
+["dragenter", "dragover"].forEach((t) => dropNen.addEventListener(t, (e) => { e.preventDefault(); dropNen.classList.add("over"); }));
+["dragleave", "drop"].forEach((t) => dropNen.addEventListener(t, (e) => { e.preventDefault(); dropNen.classList.remove("over"); }));
+dropNen.addEventListener("drop", (e) => pickNen(e.dataTransfer.files[0]));
+$("modes").addEventListener("click", (e) => {
+  const b = e.target.closest(".mode"); if (!b || b.disabled) return;
+  nen.mode = b.dataset.mode;
+  document.querySelectorAll(".mode").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+});
+$("nenTarget").addEventListener("change", () => { const c = $("nenTarget").value === "custom"; $("nenCustom").hidden = !c; $("nenCustomUnit").hidden = !c; });
+$("btnNenStop").addEventListener("click", () => { nen.stop = true; nenStatus("Đang dừng…"); });
+$("btnNenView").addEventListener("click", () => {
+  if (!nen.out) return;
+  const name = nen.file.name.replace(/\.pdf$/i, "") + "_nen.pdf";
+  openViewer(nen.out, `${name} · ${fmtMB(nen.out.length)}`, () => offerSave(name, new Blob([nen.out], { type: "application/pdf" })));
+});
+$("btnNenSave").addEventListener("click", () => {
+  if (!nen.out) return;
+  offerSave(nen.file.name.replace(/\.pdf$/i, "") + "_nen.pdf", new Blob([nen.out], { type: "application/pdf" }));
+});
+function targetBytes() {
+  const v = $("nenTarget").value;
+  const mb = v === "custom" ? parseFloat(String($("nenCustom").value).replace(",", ".")) : parseFloat(v);
+  return mb > 0 ? Math.round(mb * 1000000) : 0;   // tính chặt: 10 MB = 10.000.000 byte
+}
+$("btnNen").addEventListener("click", async () => {
+  if (!nen.bytes || nen.running) return;
+  nenLock(true);
+  const okLic = await ensure("nen", nenStatus);
+  nenLock(false);
+  if (!okLic) return;
+  const tb = targetBytes();
+  if (tb && nen.bytes.length <= tb) nenStatus("File đã nhỏ hơn dung lượng tối đa, vẫn nén để giảm thêm…");
+  nen.stop = false; nen.out = null; $("nenResult").hidden = true; nenLock(true);
+  const t0 = Date.now();
+  try {
+    const res = await compressPdf(pdfjsLib, nen.bytes, {
+      mode: nen.mode, targetBytes: tb, shouldStop: () => nen.stop,
+      onProgress: (t, f) => { nenStatus(t); $("nenBar").style.width = Math.round(f * 100) + "%"; },
+    });
+    if (res.noScan) {
+      nenStatus(`File có ${res.pages} trang đều là PDF dạng chữ (không phải scan), nén thêm không hiệu quả mà còn làm mất chữ chọn được.`, true);
+      nenLock(false); return;
+    }
+    if (res.bytes.length >= nen.bytes.length) {
+      nenStatus("File đã được nén tốt từ trước, nén lại không nhỏ hơn. Hãy thử kiểu Đen trắng hoặc giảm dung lượng tối đa.", true);
+      nenLock(false); return;
+    }
+    nen.out = res.bytes; nen.res = res;
+    consume("nen", 1);
+    $("nenBar").style.width = "100%";
+    const before = nen.bytes.length, after = res.bytes.length;
+    $("nenFrom").textContent = fmtMB(before); $("nenTo").textContent = fmtMB(after);
+    $("nenPct").textContent = `giảm ${Math.round((1 - after / before) * 100)}%`;
+    const lv = res.level;
+    $("nenInfo").innerHTML = [
+      `${res.pages} trang`, `${res.scanPages} trang scan được nén`,
+      res.textPages ? `${res.textPages} trang chữ giữ nguyên` : "",
+      `Mức dùng: ${lv.dpi} dpi${lv.q ? ", chất lượng " + Math.round(lv.q * 100) + "%" : ", đen trắng"}`,
+      nen.mode === "auto" && res.colorPages ? `${res.colorPages} trang giữ màu (có dấu/ảnh màu)` : "",
+      `${Math.round((Date.now() - t0) / 1000)} giây`,
+    ].filter(Boolean).map((x) => `<span class="pill">${esc(x)}</span>`).join("");
+    const warns = [];
+    if (!res.fit) warns.push(`Đã nén ở mức thấp nhất nhưng vẫn lớn hơn ${fmtMB(tb)}. Thử kiểu Đen trắng, hoặc tách file thành 2 phần.`);
+    if (res.levelIndex >= res.levels - 2 && res.fit) warns.push("Để đạt dung lượng này phải nén khá mạnh. Hãy xem kỹ vùng chữ nhỏ ở khung so sánh bên dưới.");
+    if (res.ocrLayerLost) warns.push("File gốc có lớp chữ OCR (bôi đen/copy được). Bản nén là ảnh nên không còn copy chữ được.");
+    $("nenWarn").hidden = !warns.length; $("nenWarn").innerHTML = warns.length ? `<b>Lưu ý</b><ul>${warns.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>` : "";
+    $("nenPage").max = res.pages; $("nenPage").value = 1;
+    $("nenResult").hidden = false;
+    nenStatus(`Xong: ${fmtMB(before)} → ${fmtMB(after)}. Xem so sánh bên dưới rồi bấm "Tải file đã nén".`);
+    await drawCompare();
+  } catch (err) {
+    console.error(err);
+    nenStatus(err && err.message === "Đã dừng" ? "Đã dừng." : "Lỗi khi nén: " + (err && err.message ? err.message : err), true);
+  }
+  nenLock(false);
+});
+const REGIONS = { top: { x: 0, y: 0, w: 0.5, h: 0.32 }, mid: { x: 0.25, y: 0.34, w: 0.5, h: 0.32 }, bot: { x: 0.5, y: 0.66, w: 0.5, h: 0.32 }, all: { x: 0, y: 0, w: 1, h: 1 } };
+let cmpBusy = false;
+async function drawCompare() {
+  if (!nen.out || cmpBusy) return;
+  cmpBusy = true;
+  try {
+    const n = Math.max(1, Math.min(nen.res.pages, parseInt($("nenPage").value, 10) || 1));
+    const r = REGIONS[$("nenRegion").value] || REGIONS.top;
+    const w = $("cvBefore").parentElement.clientWidth || 480;
+    await renderRegion(pdfjsLib, nen.bytes, n, r, w, $("cvBefore"));
+    await renderRegion(pdfjsLib, nen.out, n, r, w, $("cvAfter"));
+    $("capBefore").textContent = `Trước · trang ${n}`; $("capAfter").textContent = `Sau khi nén · trang ${n}`;
+  } catch (e) { console.error(e); }
+  cmpBusy = false;
+}
+$("nenPage").addEventListener("change", drawCompare);
+$("nenRegion").addEventListener("change", drawCompare);
+
+/* ---------- PWA: chạy offline + cài như ứng dụng ---------- */
+try {
+  if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost") && !location.hostname.endsWith("claudeusercontent.com")) {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  }
+} catch {}
+let installEvt = null;
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault(); installEvt = e; $("btnInstall").hidden = false;
+});
+$("btnInstall").addEventListener("click", async () => {
+  if (!installEvt) return;
+  installEvt.prompt();
+  try { await installEvt.userChoice; } catch {}
+  installEvt = null; $("btnInstall").hidden = true;
+});
+window.addEventListener("appinstalled", () => { $("btnInstall").hidden = true; setStatus("Đã cài ứng dụng. Mở từ Start Menu hoặc biểu tượng trên màn hình."); });
+
+/* ---------- khởi tạo các công cụ mới ---------- */
+initNhan(TOOL_DEPS());
+initChe(TOOL_DEPS());
+initSoSanh(TOOL_DEPS());
+initChup(TOOL_DEPS());
+
+/* ---------- giao diện sáng / tối ---------- */
+(function () {
+  const ORDER = ["auto", "dark", "light"], LABEL = { auto: "🌓 Tự động", dark: "🌙 Tối", light: "☀️ Sáng" };
+  const meta = document.querySelector('meta[name="theme-color"]');
+  const apply = (m) => {
+    if (m === "auto") delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = m;
+    const dark = m === "dark" || (m === "auto" && matchMedia("(prefers-color-scheme: dark)").matches);
+    if (meta) meta.content = dark ? "#12171e" : "#c0392b";
+    $("btnTheme").textContent = LABEL[m];
+    $("btnTheme").setAttribute("aria-label", "Giao diện: " + LABEL[m].slice(3) + ". Bấm để đổi");
+  };
+  let mode = lsGet("tachpdf_theme") || "auto"; if (!ORDER.includes(mode)) mode = "auto";
+  apply(mode);
+  $("btnTheme").addEventListener("click", () => { mode = ORDER[(ORDER.indexOf(mode) + 1) % 3]; lsSet("tachpdf_theme", mode); apply(mode); });
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => apply(mode));
+})();
 </script>
 </body>
 </html>
