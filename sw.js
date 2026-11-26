@@ -1,6 +1,6 @@
 /* Service worker: cho phép mở và dùng tool khi không có mạng.
    Đổi VERSION mỗi khi cập nhật file để máy người dùng lấy bản mới. */
-const VERSION = "tachpdf-v18";
+const VERSION = "tachpdf-v20";
 const CORE = [
   "./", "./index.html", "./manifest.webmanifest",
   "./pdf.min.mjs", "./pdf.worker.min.mjs", "./pdf-lib.min.js", "./jszip.min.js", "./parser.mjs", "./xlsx.mjs", "./compress.mjs", "./tool_nhan.mjs", "./tool_che.mjs", "./tool_sosanh.mjs", "./tool_chup.mjs", "./config.mjs", "./cloud.mjs",

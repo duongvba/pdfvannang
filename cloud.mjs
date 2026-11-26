@@ -15,14 +15,30 @@ try { const c = JSON.parse(get(LS_ACCT) || "null"); if (c && c.data) Object.assi
 
 export const loggedIn = () => !!get(LS_SESS) && !!acct.data;
 
-async function call(action, body, timeoutMs = 20000) {
+async function call1(action, body, timeoutMs) {
   const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), timeoutMs);
   try {
     // text/plain để không bị kiểm tra CORS trước (Apps Script không trả lời OPTIONS)
     const res = await fetch(SERVER_URL, { method: "POST", body: JSON.stringify({ action, ...body }), signal: ctl.signal, redirect: "follow" });
     if (!res.ok) throw new Error("HTTP " + res.status);
-    return await res.json();
+    const txt = await res.text();
+    try { return JSON.parse(txt); } catch { throw new Error("BADREPLY"); }
   } finally { clearTimeout(tm); }
+}
+/* Gọi máy chủ, tự thử lại 1 lần khi lỗi mạng; lỗi trả về bằng tiếng Việt */
+async function call(action, body, timeoutMs = 20000) {
+  let err;
+  for (let i = 0; i < 2; i++) {
+    try { return await call1(action, body, timeoutMs); }
+    catch (e) { err = e; if (i === 0) await new Promise((r) => setTimeout(r, 1200)); }
+  }
+  const m = String(err && err.message || err);
+  const e2 = new Error(
+    err && err.name === "AbortError" ? "Máy chủ bản quyền phản hồi quá chậm, thử lại sau ít phút." :
+    m === "BADREPLY" || /^HTTP/.test(m) ? "Máy chủ bản quyền đang gặp lỗi, vui lòng thử lại sau hoặc liên hệ người bán." :
+    "Không kết nối được máy chủ bản quyền. Kiểm tra mạng rồi thử lại.");
+  e2.name = err && err.name === "AbortError" ? "AbortError" : "NetError";
+  throw e2;
 }
 
 function save(data) {
@@ -89,7 +105,7 @@ export async function renderLoginButton(el, device, onDone, onError) {
           const r = await call("login", { idToken: resp.credential, device });
           if (!r.ok) throw new Error(r.msg || "Đăng nhập không thành công");
           set(LS_SESS, r.session); delete r.session; save(r); onDone(r);
-        } catch (e) { onError(e.name === "AbortError" ? "Máy chủ phản hồi chậm, thử lại." : e.message); }
+        } catch (e) { onError(e.message); }
       },
     });
     el.innerHTML = "";
