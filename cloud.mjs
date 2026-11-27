@@ -46,6 +46,11 @@ function save(data) {
   set(LS_ACCT, JSON.stringify({ data, checkedAt: acct.checkedAt }));
 }
 
+/* thông tin công khai cho trang Bảng giá */
+export async function info() {
+  if (!CLOUD) return null;
+  try { const r = await call("info", {}, 10000); return r && r.ok ? r : null; } catch { return null; }
+}
 export function logout() { del(LS_SESS); del(LS_ACCT); acct.data = null; acct.checkedAt = 0; acct.error = ""; try { window.google?.accounts?.id?.disableAutoSelect(); } catch {} }
 
 /* Trả về true nếu có dữ liệu dùng được (mới từ máy chủ hoặc bản lưu còn hạn khi mất mạng) */
@@ -69,14 +74,17 @@ export async function use(device, kind, n) {
 }
 
 /* Gói hiện hành, có tính thời gian ân hạn khi mất mạng */
-export function isPro() {
-  if (!acct.data || acct.data.plan !== "pro") return false;
-  if (!acct.offline) return true;
-  return Date.now() - acct.checkedAt < OFFLINE_GRACE_DAYS * 86400000;
-}
+const grace = () => !acct.offline || Date.now() - acct.checkedAt < OFFLINE_GRACE_DAYS * 86400000;
+/* gói PRO: mọi công cụ */
+export function isPro() { return !!acct.data && acct.data.plan === "pro" && grace(); }
+/* đang có gói trả phí (PLUS hoặc PRO) */
+export function isPaid() { return !!acct.data && (acct.data.plan === "pro" || acct.data.plan === "plus") && grace(); }
+export const tier = () => (isPaid() ? (acct.data.tier || acct.data.plan.toUpperCase()) : "");
+/* công cụ này có nằm trong gói đang dùng không */
+export function covers(kind) { return isPro() || (isPaid() && (acct.data.covers || []).includes(kind)); }
 export function left(kind) {
   if (!acct.data) return 0;
-  if (isPro()) return Infinity;
+  if (covers(kind)) return Infinity;
   if (acct.offline) return 0;                       // dùng thử cần có mạng
   const t = acct.data.trial[kind];
   if (t && t.free < 0) return Infinity;

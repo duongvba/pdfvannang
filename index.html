@@ -264,6 +264,36 @@ button.btn.sm { padding: 6px 12px; font-size: 13px; }
 /* ===== trang chủ: lưới công cụ ===== */
 .home { display: grid; gap: 26px; }
 .grp { display: grid; gap: 12px; }
+.pricebtn { height: 36px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--sheet); color: var(--ink); font: 600 13px var(--font-body); text-decoration: none; }
+@media (max-width: 560px) { .pricebtn { padding: 0 10px; font-size: 12px; } .pcard.pro { order: -1; } }
+@media (max-width: 430px) { .brand .bname { display: none; } }
+.pricebtn { white-space: nowrap; flex: none; }
+.pricebtn:hover { border-color: var(--stamp); color: var(--stamp); }
+.acctbtns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; } .acctbtns a.btn { text-decoration: none; }
+.pricestrip { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; justify-content: space-between; padding: 14px 18px; border: 1px solid color-mix(in srgb, var(--stamp) 40%, var(--line)); border-radius: 14px; background: color-mix(in srgb, var(--stamp) 6%, var(--sheet)); color: var(--ink); text-decoration: none; }
+.pricestrip b { font: 700 15px var(--font-body); } .pricestrip span { color: var(--stamp); font-weight: 600; white-space: nowrap; }
+.pricing { display: grid; gap: 18px; }
+.pcards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; align-items: start; }
+.pcard { border: 1px solid var(--line); border-radius: 16px; background: var(--sheet); padding: 22px; display: grid; gap: 12px; }
+.pcard.pro { border: 2px solid var(--stamp); box-shadow: 0 8px 28px color-mix(in srgb, var(--stamp) 14%, transparent); }
+.pcard h3 { margin: 0; font: 700 18px var(--font-body); display: flex; gap: 8px; align-items: center; }
+.pcard .tag { font: 700 11px var(--font-body); padding: 3px 8px; border-radius: 999px; background: var(--stamp); color: #fff; }
+.pprice { font: 800 34px var(--font-body); line-height: 1.1; } .pprice small { font: 500 15px var(--font-body); color: var(--muted); }
+.palt { margin: -6px 0 0; color: var(--muted); font-size: 14px; } .palt b { color: var(--ink); }
+.plist { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; font-size: 14px; }
+.plist li { display: grid; grid-template-columns: 20px 1fr auto; gap: 6px; align-items: baseline; }
+.plist li::before { content: "✓"; color: var(--ok); font-weight: 700; } .plist li.dim::before { content: "•"; color: var(--muted); }
+.plist li em { font-style: normal; color: var(--muted); white-space: nowrap; }
+.plist .sub { grid-template-columns: 1fr; font: 700 12px var(--font-body); color: var(--muted); letter-spacing: .04em; text-transform: uppercase; margin-top: 6px; } .plist .sub::before { content: none; }
+.zalobtn { display: inline-flex; justify-content: center; align-items: center; gap: 8px; padding: 12px 18px; border-radius: 10px; background: #0068ff; color: #fff; font: 700 15px var(--font-body); text-decoration: none; }
+.zalobtn:hover { filter: brightness(1.08); }
+.psteps { counter-reset: st; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.psteps li { counter-increment: st; border: 1px solid var(--line); border-radius: 12px; background: var(--sheet); padding: 14px 14px 14px 54px; position: relative; font-size: 14px; }
+.psteps li::before { content: counter(st); position: absolute; left: 14px; top: 13px; width: 28px; height: 28px; border-radius: 50%; background: var(--stamp); color: #fff; display: grid; place-items: center; font-weight: 700; }
+.psteps b { display: block; margin-bottom: 2px; }
+.faq { display: grid; gap: 8px; } .faq details { border: 1px solid var(--line); border-radius: 10px; background: var(--sheet); padding: 12px 14px; }
+.faq summary { cursor: pointer; font-weight: 600; } .faq p { margin: 8px 0 0; font-size: 14px; color: var(--muted); }
+.pricing h2 { font: 700 13px var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 6px 0 0; }
 .grp h2 { font: 700 13px var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0; }
 .toolgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
 .toolcard { position: relative; display: grid; grid-template-columns: 48px 1fr; gap: 4px 14px; align-items: start; padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--sheet); color: var(--ink); text-decoration: none; transition: border-color .15s, box-shadow .15s, transform .15s; }
@@ -296,6 +326,7 @@ button.btn.sm { padding: 6px 12px; font-size: 13px; }
   <div class="tbright">
     <button class="btn install" id="btnInstall" type="button" hidden title="Cài thành ứng dụng trên máy">⬇ Cài app</button>
     <button class="iconbtn" id="btnTheme" type="button" title="Đổi giao diện sáng / tối">🌓</button>
+    <a class="pricebtn" id="btnPrice" href="#bang-gia">Bảng giá</a>
     <button class="licbadge" id="licBadge" type="button" aria-controls="licPanel" aria-expanded="false">Bản dùng thử</button>
     <button class="acctbtn" id="acctBtn" type="button" aria-controls="licPanel" aria-expanded="false"><span class="avatar" id="acctAvatar" aria-hidden="true"></span><span class="acctlabel" id="acctLabel">Đăng nhập</span></button>
     <section class="licpanel pop" id="licPanel" aria-label="Tài khoản và bản quyền" hidden>
@@ -312,7 +343,7 @@ button.btn.sm { padding: 6px 12px; font-size: 13px; }
         <div id="acctIn" hidden style="display:grid">
           <div class="acctrow"><span class="plan" id="acctPlanPill">Dùng thử</span><b id="acctEmail"></b></div>
           <p class="note" id="acctPlan" style="margin:0"></p>
-          <button class="btn sm" id="btnCopyEmail" type="button" hidden style="justify-self:start;margin-top:8px">📋 Sao chép email để gửi</button>
+          <span class="acctbtns"><button class="btn sm" id="btnCopyEmail" type="button" hidden>📋 Sao chép email để gửi</button><a class="btn sm" id="lnkPrice" href="#bang-gia" hidden>Xem bảng giá PRO</a></span>
         </div>
       </div>
       <div class="usage" id="usageList"></div>
@@ -512,6 +543,7 @@ button.btn.sm { padding: 6px 12px; font-size: 13px; }
   <div id="viewWord" role="tabpanel" hidden style="display:grid; gap:20px;"></div>
   <div id="viewExcel" role="tabpanel" hidden style="display:grid; gap:20px;"></div>
   <div id="viewMatKhau" role="tabpanel" hidden style="display:grid; gap:20px;"></div>
+  <div id="viewBangGia" hidden></div>
 </main>
 
 <div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-labelledby="vTitle" hidden>
@@ -812,11 +844,14 @@ const unitOf = (k) => (k === "word" || k === "excel" ? "trang" : k === "hd" || k
 const isFreeKind = (k) => FREE[k] < 0;
 function planText(d) {
   if (!d) return "";
-  if (d.plan === "pro") return `Bản quyền: ${d.exp ? "đến " + fmtDate(d.exp) : "vĩnh viễn"} · đang dùng ${d.devices.used}/${d.devices.max} máy.` + (cloud.acct.offline ? " Đang mất kết nối máy chủ, vẫn dùng được trong vài ngày." : "");
+  if (d.plan === "pro" || d.plan === "plus") return `Gói ${d.tier || d.plan.toUpperCase()}: ${d.exp ? "đến " + fmtDate(d.exp) : "vĩnh viễn"} · đang dùng ${d.devices.used}/${d.devices.max} máy.`
+    + (d.plan === "plus" ? ` Không giới hạn: ${plusNames(d)}. Công cụ khác dùng theo lượt dùng thử, nâng lên PRO để dùng hết.` : "")
+    + (cloud.acct.offline ? " Đang mất kết nối máy chủ, vẫn dùng được trong vài ngày." : "");
   if (d.plan === "device") return `Tài khoản có bản quyền nhưng đã dùng đủ ${d.devices.max} máy. Máy không mở app 30 ngày sẽ tự được gỡ, hoặc nhờ người bán xóa danh sách máy.`;
   if (d.plan === "locked") return "Tài khoản đã bị khóa. " + (d.contact || "");
-  return (d.expired ? "Bản quyền đã hết hạn. " : "") + `Để mua bản quyền: gửi email ${d.email} cho người bán. ${d.contact || ""}`;
+  return (d.expired ? "Bản quyền đã hết hạn. " : "") + (d.prices ? `Bảng giá: ${d.prices}. ` : "") + `Để mua: gửi email ${d.email} cho người bán. ${d.contact || ""}`;
 }
+const plusNames = (d) => ((d && d.plan === "plus" ? d.covers : d && d.plans && d.plans.PLUS) || []).map((k) => KIND_NAME[k]).filter(Boolean).join(", ");
 function trialSummary() {
   return Object.keys(KIND_NAME).filter((k) => !isFreeKind(k)).map((k) => `${KIND_NAME[k]} ${Math.min(freeOf(k) - leftOf(k), freeOf(k))}/${freeOf(k)}`).join(" · ");
 }
@@ -824,7 +859,7 @@ function renderLic() { renderLicCore(); renderTop(); }
 const initialOf = (x) => { x = String(x || "").trim(); return x ? x[0] : "?"; };
 const shortWho = (x) => (String(x).includes("@") ? String(x).split("@")[0] : String(x));
 function renderTop() {
-  const d = cloud.acct.data, inn = cloud.CLOUD && cloud.loggedIn(), keyPro = ALLOW_OFFLINE_KEY && lic.ok, pro = proActive();
+  const d = cloud.acct.data, inn = cloud.CLOUD && cloud.loggedIn(), keyPro = ALLOW_OFFLINE_KEY && lic.ok, pro = proActive(), paid = pro || (cloud.CLOUD && cloud.isPaid());
   const who = keyPro ? lic.info.n : inn ? (d.name || d.email) : "";
   const btn = $("acctBtn"), needLogin = cloud.CLOUD && !inn && !keyPro;
   btn.classList.toggle("login", needLogin);
@@ -832,22 +867,24 @@ function renderTop() {
   else if (who) { $("acctAvatar").textContent = initialOf(who); $("acctLabel").textContent = shortWho(who); }
   else { $("acctAvatar").textContent = "🔑"; $("acctLabel").textContent = "Kích hoạt"; }
   btn.title = inn ? d.email : needLogin ? "Đăng nhập Google để dùng thử" : "Bản quyền";
-  $("acctAvatar").classList.toggle("pro", pro); $("popAvatar").classList.toggle("pro", pro);
+  $("acctAvatar").classList.toggle("pro", paid); $("popAvatar").classList.toggle("pro", paid);
   $("popAvatar").textContent = who ? initialOf(who) : "🔑";
   if (inn && d) {
     const pl = $("acctPlanPill");
-    pl.textContent = d.plan === "pro" ? "Bản quyền" : d.plan === "device" ? "Vượt số máy" : d.plan === "locked" ? "Đã khóa" : "Dùng thử";
-    pl.className = "plan " + (d.plan === "pro" ? "pro" : d.plan === "trial" ? "" : "bad");
+    pl.textContent = d.plan === "pro" ? "PRO" : d.plan === "plus" ? "PLUS" : d.plan === "device" ? "Vượt số máy" : d.plan === "locked" ? "Đã khóa" : "Dùng thử";
+    pl.className = "plan " + (d.plan === "pro" || d.plan === "plus" ? "pro" : d.plan === "trial" ? "" : "bad");
   }
   $("btnLogout").hidden = !inn;
   $("btnCopyEmail").hidden = !(inn && d && d.plan !== "pro");
-  $("licBadge").hidden = pro || needLogin;
+  $("licBadge").hidden = pro || needLogin || window.__curView === "banggia";
+  $("lnkPrice").hidden = pro || (d && d.plan === "pro");
   const ul = $("usageList");
   if (pro || needLogin || (cloud.CLOUD && cloud.acct.offline)) ul.innerHTML = "";
-  else ul.innerHTML = Object.keys(KIND_NAME).filter((k) => !isFreeKind(k)).map((k) => {
+  else ul.innerHTML = Object.keys(KIND_NAME).filter((k) => !isFreeKind(k) && !coveredBy(k)).map((k) => {
     const f = freeOf(k), used = Math.max(0, Math.min(f, f - leftOf(k))), pct = f ? (used / f) * 100 : 0;
     return `<div class="urow"><span>${KIND_NAME[k]}</span><span class="uval">${used}/${f} ${unitOf(k)}</span><span class="ubar"><i class="${pct >= 100 ? "end" : pct >= 70 ? "mid" : ""}" style="width:${pct}%"></i></span></div>`;
   }).join("");
+  if (ul.innerHTML && plusOnly()) ul.innerHTML = `<p class="note" style="margin:0 0 2px">Công cụ ngoài gói PLUS (đang dùng thử):</p>` + ul.innerHTML;
   if (ul.innerHTML) ul.innerHTML += `<p class="note" style="margin:2px 0 0">Miễn phí không giới hạn: Ghép & sắp xếp, Tách theo trang, PDF sang ảnh, Chụp giấy tờ, Nén file dưới ${NEN_FREE_MB} MB.</p>`;
 }
 function renderLicCore() {
@@ -867,7 +904,16 @@ function renderLicCore() {
   if (proActive()) {
     b.textContent = "✓ Bản quyền: " + (keyPro ? lic.info.n : (d.name || d.email)); b.classList.add("on");
     $("licTitle").textContent = "Đã kích hoạt bản quyền";
-    $("licInfo").textContent = keyPro ? `Cấp cho: ${lic.info.n} · Hạn dùng: ${fmtDate(lic.info.e)} · Không giới hạn số hóa đơn.` : "Dùng không giới hạn tất cả công cụ.";
+    $("licInfo").textContent = keyPro ? `Cấp cho: ${lic.info.n} · Hạn dùng: ${fmtDate(lic.info.e)} · Không giới hạn số hóa đơn.` : "Gói PRO: dùng không giới hạn tất cả công cụ.";
+    return;
+  }
+  if (plusOnly()) {
+    const inPlan = coveredBy(kind) || isFreeKind(kind);
+    b.classList.toggle("on", inPlan);
+    const l = leftOf(kind), f = freeOf(kind);
+    b.textContent = isFreeKind(kind) ? "Miễn phí" : inPlan ? "✓ Gói PLUS" : l > 0 ? `Ngoài gói: còn ${l}/${f} ${unitOf(kind)}` : "Cần nâng cấp PRO";
+    $("licTitle").textContent = "Đang dùng gói PLUS";
+    $("licInfo").textContent = "Muốn dùng không giới hạn mọi công cụ: nâng lên gói PRO." + (d.prices ? ` (${d.prices})` : "");
     return;
   }
   b.classList.remove("on");
@@ -954,8 +1000,11 @@ const NEN_FREE_MB = 20;   // nén file nhỏ hơn mức này: miễn phí     //
 const LOCAL_KEY = { hd: LS.used, nen: "tachpdf_nen", nhan: "tachpdf_t_nhan", che: "tachpdf_t_che", sosanh: "tachpdf_t_sosanh", chup: "tachpdf_t_chup", xml: "tachpdf_t_xml", ghep: "tachpdf_t_ghep", dong: "tachpdf_t_dong", tron: "tachpdf_t_tron", word: "tachpdf_t_word", excel: "tachpdf_t_excel", tachtrang: "tachpdf_t_tt", anh: "tachpdf_t_anh" };
 const localUsed = (k) => parseInt(lsGet(LOCAL_KEY[k]) || "0", 10) || 0;
 function proActive() { return (ALLOW_OFFLINE_KEY && lic.ok) || (cloud.CLOUD && cloud.isPro()); }
+/* công cụ nằm trong gói đang dùng (PRO: mọi công cụ, PLUS: một số công cụ) */
+function coveredBy(kind) { return proActive() || (cloud.CLOUD && cloud.covers(kind)); }
+const plusOnly = () => cloud.CLOUD && cloud.isPaid() && !cloud.isPro() && !(ALLOW_OFFLINE_KEY && lic.ok);
 function leftOf(kind) {
-  if (proActive() || isFreeKind(kind) || SAMPLE_ON.has(kind)) return Infinity;
+  if (coveredBy(kind) || isFreeKind(kind) || SAMPLE_ON.has(kind)) return Infinity;
   if (cloud.CLOUD) return cloud.left(kind);
   return Math.max(0, FREE[kind] - localUsed(kind));
 }
@@ -969,15 +1018,16 @@ async function ensure(kind, say) {
   if (cloud.CLOUD) {
     if (!cloud.loggedIn()) { say("Hãy đăng nhập Google để dùng thử miễn phí (nút đăng nhập ở khung phía trên).", true); renderLic(); openLic(); return false; }
     say("Đang kiểm tra bản quyền…");
-    await cloud.refresh(lic.mid, cloud.isPro() ? 6 * 3600000 : 0);      // bản quyền: kiểm tra lại mỗi 6 giờ
+    await cloud.refresh(lic.mid, cloud.covers(kind) ? 6 * 3600000 : 0);      // bản quyền: kiểm tra lại mỗi 6 giờ
     renderLic();
     if (!cloud.loggedIn()) { say("Phiên đăng nhập đã hết hạn, hãy đăng nhập lại.", true); showLoginButton(); openLic(); return false; }
     const d = cloud.acct.data;
     if (d.plan === "locked" || d.plan === "device") { say(planText(d), true); openLic(); return false; }
-    if (cloud.acct.offline && !cloud.isPro()) { say("Không kết nối được máy chủ bản quyền. Bản dùng thử cần có mạng, kiểm tra kết nối rồi thử lại.", true); return false; }
+    if (cloud.acct.offline && !cloud.covers(kind)) { say("Không kết nối được máy chủ bản quyền. Bản dùng thử cần có mạng, kiểm tra kết nối rồi thử lại.", true); return false; }
   }
   if (leftOf(kind) > 0) return true;
-  say(`Bạn đã dùng hết ${freeOf(kind)} ${unitOf(kind)} miễn phí của ${KIND_NAME[kind]}. Hãy kích hoạt bản quyền để tiếp tục.`, true);
+  if (plusOnly()) { say(`Gói PLUS chưa gồm ${KIND_NAME[kind]} và bạn đã dùng hết ${freeOf(kind)} ${unitOf(kind)} dùng thử. Nâng cấp lên PRO để dùng không giới hạn mọi công cụ. ${cloud.acct.data.contact || ""}`, true); openLic(); return false; }
+  say(`Bạn đã dùng hết ${freeOf(kind)} ${unitOf(kind)} miễn phí của ${KIND_NAME[kind]}. Nâng cấp PRO để dùng không giới hạn (xem mục "Bảng giá" ở thanh trên cùng).`, true);
   openLic(); return false;
 }
 /* Ghi nhận đã dùng n lượt (sau khi chạy xong) */
@@ -1204,7 +1254,7 @@ async function run(limit) {
     setBar(1); render();
     if (state.results[0]) { previewInfo = state.results[0]; updatePreview(); }
     const bad = state.results.filter((r) => !r.ok).length;
-    const trialCut = !proActive() && limit !== userLimit && state.results.length >= limit;
+    const trialCut = !coveredBy("hd") && limit !== userLimit && state.results.length >= limit;
     setStatus((state.stop ? "Đã dừng. " : "") + `Xong ${state.results.length} hóa đơn${outs.length !== state.results.length ? ` → ${outs.length} file` : ""}${userLimit ? " (chạy thử)" : ""}.` +
       (trialCut ? ` Đã hết lượt dùng thử nên chỉ tách ${state.results.length} hóa đơn đầu, kích hoạt bản quyền để tách toàn bộ.` : "") +
       (bad ? ` ${bad} dòng cần kiểm tra.` : "") + " Bấm \"Tải ZIP kết quả\" hoặc \"Tải bảng kê Excel\" để lưu.");
@@ -1345,6 +1395,7 @@ const VIEWS = {
   nen: { el: "viewNen", hash: "#nen-pdf", name: "Nén PDF", desc: "Giảm dung lượng file scan để gửi email, nộp hồ sơ online.", title: 'Nén PDF <span>mà chữ vẫn rõ</span>', sub: "Giảm dung lượng file scan để gửi email, nộp hồ sơ online. Tự chọn mức nét nhất mà vẫn dưới dung lượng cho phép." },
   chup: { el: "viewChup", hash: "#chup-giay-to", name: "Chụp giấy tờ thành PDF", desc: "Chụp bằng điện thoại, tự cắt mép, làm phẳng, làm trắng nền.", title: 'Chụp giấy tờ <span>thành PDF</span>', sub: "Chụp bằng điện thoại, tool tự cắt mép, làm phẳng, làm trắng nền rồi ghép thành file PDF." },
   che: { el: "viewChe", hash: "#che-thong-tin", name: "Che thông tin nhạy cảm", desc: "Tự tìm và xóa hẳn số CCCD, điện thoại, tài khoản trước khi gửi.", title: 'Che thông tin <span>nhạy cảm</span>', sub: "Tự tìm và che số CCCD, số điện thoại, số tài khoản, email… Vùng che được xóa hẳn khỏi file, không gỡ ra được." },
+  banggia: { el: "viewBangGia", hash: "#bang-gia", name: "Bảng giá", title: 'Bảng giá <span>PDF Vạn Năng</span>', sub: "Dùng thử miễn phí, không cần thẻ thanh toán. Cần dùng nhiều thì nâng cấp PRO để dùng không giới hạn tất cả công cụ." },
   matkhau: { el: "viewMatKhau", hash: "#mat-khau-pdf", name: "Đặt & gỡ mật khẩu PDF", desc: "Khóa phiếu lương, sao kê… mỗi file 1 mật khẩu riêng, xuất danh sách Excel.", isNew: true, title: 'Mật khẩu PDF <span>hàng loạt</span>', sub: "Đặt mật khẩu chung hoặc riêng từng file (tự tạo ngẫu nhiên), tách file theo tên người nhận, lưu danh sách mật khẩu ra Excel. Gỡ mật khẩu hàng loạt khi đã biết mật khẩu." },
   sosanh: { el: "viewSoSanh", hash: "#so-sanh", name: "So sánh 2 bản", desc: "Tìm chỗ khác nhau giữa 2 bản hợp đồng, báo giá.", title: 'So sánh <span>2 phiên bản tài liệu</span>', sub: "Đặt bản cũ và bản mới cạnh nhau, tô màu chỗ thêm, xóa, sửa, đặc biệt là các con số." },
 };
@@ -1352,6 +1403,63 @@ const VIEWS = {
 $("viewHome").innerHTML = GROUPS.map((g) => `<section class="grp" aria-label="${g.name}"><h2>${g.name}</h2><div class="toolgrid">` +
   g.tools.map((k) => { const v = VIEWS[k]; return `<a class="toolcard" href="${v.hash}" style="--tc:${g.color}"><span class="ticon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg></span><b>${v.name}${v.isNew ? '<span class="new">Mới</span>' : ""}</b><small>${v.desc}</small></a>`; }).join("") +
   `</div></section>`).join("");
+$("viewHome").insertAdjacentHTML("beforeend", `<a class="pricestrip" href="#bang-gia"><b>⭐ Bản PRO: dùng không giới hạn tất cả công cụ</b><span>Xem bảng giá →</span></a>`);
+/* ---------- trang Bảng giá ---------- */
+const PRICING = { year: 99000, forever: 269000, zalo: "0979992697", devices: 2 };   // dự phòng khi chưa lấy được từ máy chủ
+let pricingLoaded = false;
+const vnd = (n) => Number(n).toLocaleString("vi-VN") + "đ";
+function renderPricing() {
+  const P = PRICING, free = Object.keys(KIND_NAME).filter((k) => isFreeKind(k)), trial = Object.keys(KIND_NAME).filter((k) => !isFreeKind(k));
+  const zl = String(P.zalo || "").replace(/\D/g, "");
+  $("viewBangGia").innerHTML = `<div class="pricing">
+  <div class="pcards">
+    <div class="pcard">
+      <h3>Dùng thử</h3>
+      <div class="pprice">0đ</div>
+      <p class="palt">Đăng nhập Google là dùng được, không cần thẻ thanh toán.</p>
+      <ul class="plist">
+        <li class="sub">Miễn phí không giới hạn</li>
+        ${free.map((k) => `<li>${KIND_NAME[k]}</li>`).join("")}<li>Nén file dưới ${NEN_FREE_MB} MB</li><li>Gỡ mật khẩu PDF</li>
+        <li class="sub">Dùng thử có giới hạn</li>
+        ${trial.map((k) => `<li class="dim">${KIND_NAME[k]}<em>${(P.free && P.free[k] > 0 ? P.free[k] : FREE[k])} ${unitOf(k)}</em></li>`).join("")}
+      </ul>
+    </div>
+    <div class="pcard pro">
+      <h3>PRO <span class="tag">Khuyên dùng</span></h3>
+      ${P.year ? `<div class="pprice">${vnd(P.year)} <small>/ năm</small></div>` : ""}
+      ${P.forever ? (P.year ? `<p class="palt">hoặc <b>${vnd(P.forever)}</b> dùng vĩnh viễn, trả một lần</p>` : `<div class="pprice">${vnd(P.forever)} <small>vĩnh viễn</small></div>`) : ""}
+      <ul class="plist">
+        <li><span><b>Không giới hạn</b> tất cả ${Object.keys(KIND_NAME).length} công cụ</span></li>
+        <li>Tách hóa đơn, đọc XML, PDF sang Word/Excel không giới hạn số lượng</li>
+        <li>Dùng trên ${P.devices} máy (máy tính hoặc điện thoại)</li>
+        <li>File xử lý ngay trên máy bạn, không tải lên mạng</li>
+        <li>Chạy trên trình duyệt, cài được như ứng dụng</li>
+      </ul>
+      ${zl ? `<a class="zalobtn" href="https://zalo.me/${zl}" target="_blank" rel="noopener">💬 Nhắn Zalo ${esc(P.zalo)} để mua</a>` : ""}
+    </div>
+  </div>
+  <h2>Cách nâng cấp PRO</h2>
+  <ol class="psteps">
+    <li><b>Đăng nhập Google</b>Bấm nút Đăng nhập ở góc trên bên phải của app.</li>
+    <li><b>Gửi email cho người bán</b>Mở ô tài khoản, bấm "Sao chép email để gửi" rồi nhắn qua Zalo${zl ? " " + esc(P.zalo) : ""}, chọn gói năm hoặc vĩnh viễn.</li>
+    <li><b>Chuyển khoản và dùng ngay</b>Chuyển khoản theo hướng dẫn qua Zalo. Khi được kích hoạt, tải lại trang là dùng PRO.</li>
+  </ol>
+  <h2>Câu hỏi thường gặp</h2>
+  <div class="faq">
+    <details><summary>Một tài khoản PRO dùng được mấy máy?</summary><p>${P.devices} máy (máy tính hoặc điện thoại). Máy không mở app 30 ngày sẽ tự được gỡ khỏi danh sách. Cần đổi máy gấp thì nhắn Zalo để được hỗ trợ.</p></details>
+    <details><summary>File của tôi có bị tải lên mạng không?</summary><p>Không. Mọi file được xử lý ngay trên máy bạn. Máy chủ chỉ lưu email và số lượt đã dùng để quản lý bản quyền.</p></details>
+    <details><summary>Hết hạn gói năm thì sao?</summary><p>Tài khoản trở về bản dùng thử, các công cụ miễn phí vẫn dùng bình thường. Muốn gia hạn thì nhắn Zalo, thời hạn được cộng nối tiếp.</p></details>
+    <details><summary>Có cần cài đặt gì không?</summary><p>Không cần. App chạy trên trình duyệt (Chrome, Edge, Safari…). Có thể bấm "Cài app" để mở nhanh như phần mềm trên máy.</p></details>
+  </div>
+</div>`;
+}
+async function loadPricing() {
+  renderPricing();
+  if (pricingLoaded) return; pricingLoaded = true;
+  const r = await cloud.info();
+  if (r) { if (r.year !== undefined) PRICING.year = r.year; if (r.forever !== undefined) PRICING.forever = r.forever; if (r.zalo) PRICING.zalo = r.zalo; if (r.devices) PRICING.devices = r.devices; if (r.free) PRICING.free = r.free; if (window.__curView === "banggia") renderPricing(); }
+}
+$("lnkPrice").addEventListener("click", () => toggleLic(false));
 $("toolJump").innerHTML = `<option value="">Chuyển công cụ…</option>` + GROUPS.map((g) => `<optgroup label="${g.name}">` + g.tools.map((k) => `<option value="${k}">${VIEWS[k].name}</option>`).join("") + "</optgroup>").join("");
 $("toolJump").addEventListener("change", (e) => { const k = e.target.value; e.target.value = ""; if (k) location.hash = VIEWS[k].hash; });
 function viewFromHash() { for (const [k, v] of Object.entries(VIEWS)) if (v.hash && location.hash === v.hash) return k; return "home"; }
@@ -1364,6 +1472,7 @@ function showView(v) {
   $("appTitle").innerHTML = VIEWS[v].title; $("appSub").textContent = VIEWS[v].sub;
   document.title = v === "home" ? "PDF Vạn Năng – Bộ công cụ PDF cho văn phòng" : `${VIEWS[v].name} – PDF Vạn Năng`;
   if (prev && prev !== v) window.scrollTo({ top: 0 });
+  if (v === "banggia") loadPricing();
 }
 $("backHome").addEventListener("click", (e) => { e.preventDefault(); if (location.hash) { history.pushState(null, "", location.pathname + location.search); } showView("home"); });
 window.addEventListener("hashchange", () => showView(viewFromHash()));
