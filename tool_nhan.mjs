@@ -45,6 +45,30 @@ const HTML = `
   </table></div>
 </section>`;
 
+/* lấy giá trị sau nhãn: cùng dòng, hoặc dòng kế tiếp nếu cùng dòng trống */
+function labelRe(label, fold) {
+  const f = fold(label.trim()).replace(/[:：]+$/, "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s*");
+  return new RegExp("(?:^|[^a-z0-9])" + f + "[ \\t]*[:;.]?[ \\t]*([^\\r\\n]*)(?:\\r?\\n[ \\t]*([^\\r\\n]*))?", "g");
+}
+export function labelValue(text, label, fold) {
+  if (!label.trim()) return "";
+  const t = text.normalize("NFC"), ft = fold(t);
+  const re = labelRe(label, fold);
+  let m;
+  while ((m = re.exec(ft))) {
+    for (const gi of [1, 2]) {
+      if (m[gi] === undefined) continue;
+      const start = ft.indexOf(m[gi], m.index + (gi === 2 ? m[0].length - m[gi].length : 0));
+      let v = t.slice(start, start + m[gi].length);
+      const p = v.indexOf("   "); if (p >= 0) v = v.slice(0, p);
+      v = v.trim().replace(/^[:;.\-|_ ]+|[:;.\-|_ ]+$/g, "");
+      if (v.length >= 2 && !/^\(.*\)$/.test(v)) return v;
+    }
+  }
+  return "";
+}
+
+
 export function initNhan(D) {
   const { $, esc, fold } = D;
   $("viewNhan").innerHTML = HTML;
@@ -102,28 +126,7 @@ export function initNhan(D) {
   ["dragleave", "drop"].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove("over"); }));
   drop.addEventListener("drop", (e) => pick(e.dataTransfer.files));
 
-  /* lấy giá trị sau nhãn: cùng dòng, hoặc dòng kế tiếp nếu cùng dòng trống */
-  function labelRe(label) {
-    const f = fold(label.trim()).replace(/[:：]+$/, "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s*");
-    return new RegExp("(?:^|[^a-z0-9])" + f + "[ \\t]*[:;.]?[ \\t]*([^\\r\\n]*)(?:\\r?\\n[ \\t]*([^\\r\\n]*))?", "g");
-  }
-  function getValue(text, label) {
-    if (!label.trim()) return "";
-    const t = text.normalize("NFC"), ft = fold(t);
-    const re = labelRe(label);
-    let m;
-    while ((m = re.exec(ft))) {
-      for (const gi of [1, 2]) {
-        if (m[gi] === undefined) continue;
-        const start = ft.indexOf(m[gi], m.index + (gi === 2 ? m[0].length - m[gi].length : 0));
-        let v = t.slice(start, start + m[gi].length);
-        const p = v.indexOf("   "); if (p >= 0) v = v.slice(0, p);
-        v = v.trim().replace(/^[:;.\-|_ ]+|[:;.\-|_ ]+$/g, "");
-        if (v.length >= 2 && !/^\(.*\)$/.test(v)) return v;
-      }
-    }
-    return "";
-  }
+  const getValue = (text, label) => labelValue(text, label, fold);
 
   function render() {
     $("nhBody").innerHTML = st.results.map((r, i) => `<tr class="${r.ok ? "" : "check"}">
@@ -149,7 +152,8 @@ export function initNhan(D) {
     const l1 = $("nhLabel1").value.trim(), l2 = $("nhLabel2").value.trim(), tpl = $("nhTpl").value.trim() || "{nhan1}";
     if (!l1) { status("Hãy nhập nhãn chính, ví dụ \"Họ và tên\".", true); $("nhLabel1").focus(); return; }
     if (!(await D.trialAllow("nhan", status))) return;
-    const each = $("nhEach").checked;
+    const each = $("nhEach").checked, left = D.trialLeft("nhan");
+    if (left !== Infinity) limit = limit ? Math.min(limit, left) : left;
     st.stop = false; st.zip = null; st.results = []; render(); lock(true); $("nhBar").style.width = "0%";
     try {
       const groups = [];
@@ -217,10 +221,10 @@ export function initNhan(D) {
         rows: rows.map((r, i) => [i + 1, r.v1, r.v2, r.nguon, r.trang, r.file, r.msg]) }]);
       zip.file("DanhSach.xlsx", xlsx);
       st.zip = await zip.generateAsync({ type: "blob", compression: "STORE" });
-      st.results = rows; render(); D.trialUse("nhan");
+      st.results = rows; render(); D.trialUse("nhan", rows.length);
       $("nhBar").style.width = "100%";
       const bad = rows.filter((r) => !r.ok).length;
-      status(`${st.stop ? "Đã dừng. " : ""}Xong ${rows.length} file${limit ? " (chạy thử)" : ""}.${bad ? ` ${bad} dòng cần kiểm tra.` : ""} Bấm "Tải ZIP kết quả" để lưu (kèm DanhSach.xlsx).`);
+      status(`${st.stop ? "Đã dừng. " : ""}Xong ${rows.length} file${limit && limit === left ? " (đã dùng hết lượt dùng thử, kích hoạt bản quyền để tách hết)" : limit ? " (chạy thử)" : ""}.${bad ? ` ${bad} dòng cần kiểm tra.` : ""} Bấm "Tải ZIP kết quả" để lưu (kèm DanhSach.xlsx).`);
     } catch (err) {
       console.error(err);
       status("Lỗi khi xử lý: " + (err && err.message ? err.message : err), true);

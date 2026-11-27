@@ -78,9 +78,12 @@ export function left(kind) {
   if (!acct.data) return 0;
   if (isPro()) return Infinity;
   if (acct.offline) return 0;                       // dùng thử cần có mạng
-  const t = acct.data.trial[kind]; return t ? Math.max(0, t.free - t.used) : 0;
+  const t = acct.data.trial[kind];
+  if (t && t.free < 0) return Infinity;
+  return t ? Math.max(0, t.free - t.used) : 10;      // máy chủ cũ chưa có công cụ này: tạm cho dùng
 }
-export const freeOf = (kind) => (acct.data && acct.data.trial[kind] ? acct.data.trial[kind].free : 0);
+export function knownKind(kind) { return !!(acct.data && acct.data.trial && acct.data.trial[kind]); }
+export const freeOf = (kind) => (acct.data && acct.data.trial[kind] ? acct.data.trial[kind].free : 10);
 
 /* ---------- nút "Đăng nhập bằng Google" ---------- */
 let gsiReady = null;

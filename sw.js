@@ -1,9 +1,9 @@
 /* Service worker: cho phép mở và dùng tool khi không có mạng.
    Đổi VERSION mỗi khi cập nhật file để máy người dùng lấy bản mới. */
-const VERSION = "tachpdf-v20";
+const VERSION = "tachpdf-v26";
 const CORE = [
   "./", "./index.html", "./manifest.webmanifest",
-  "./pdf.min.mjs", "./pdf.worker.min.mjs", "./pdf-lib.min.js", "./jszip.min.js", "./parser.mjs", "./xlsx.mjs", "./compress.mjs", "./tool_nhan.mjs", "./tool_che.mjs", "./tool_sosanh.mjs", "./tool_chup.mjs", "./config.mjs", "./cloud.mjs",
+  "./pdf.min.mjs", "./pdf.worker.min.mjs", "./pdf-lib.min.js", "./jszip.min.js", "./parser.mjs", "./xlsx.mjs", "./compress.mjs", "./tool_nhan.mjs", "./tool_che.mjs", "./tool_sosanh.mjs", "./tool_chup.mjs", "./config.mjs", "./cloud.mjs", "./tool_xml.mjs", "./tool_ghep.mjs", "./tool_dong.mjs", "./tool_tachtrang.mjs", "./tool_anh.mjs", "./tool_tron.mjs", "./tool_chuyen.mjs", "./tool_matkhau.mjs", "./pdfcrypt.mjs", "./layout.mjs",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/maskable-512.png",
   "./icons/apple-touch-icon.png", "./icons/favicon-32.png",
 ];
