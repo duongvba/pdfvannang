@@ -1405,7 +1405,7 @@ $("viewHome").innerHTML = GROUPS.map((g) => `<section class="grp" aria-label="${
   `</div></section>`).join("");
 $("viewHome").insertAdjacentHTML("beforeend", `<a class="pricestrip" href="#bang-gia"><b>⭐ Bản PRO: dùng không giới hạn tất cả công cụ</b><span>Xem bảng giá →</span></a>`);
 /* ---------- trang Bảng giá ---------- */
-const PRICING = { year: 99000, forever: 269000, zalo: "0979992697", devices: 2 };   // dự phòng khi chưa lấy được từ máy chủ
+const PRICING = { half: 59000, year: 99000, forever: 269000, zalo: "0979992697", devices: 2 };   // dự phòng khi chưa lấy được từ máy chủ
 let pricingLoaded = false;
 const vnd = (n) => Number(n).toLocaleString("vi-VN") + "đ";
 function renderPricing() {
@@ -1427,7 +1427,7 @@ function renderPricing() {
     <div class="pcard pro">
       <h3>PRO <span class="tag">Khuyên dùng</span></h3>
       ${P.year ? `<div class="pprice">${vnd(P.year)} <small>/ năm</small></div>` : ""}
-      ${P.forever ? (P.year ? `<p class="palt">hoặc <b>${vnd(P.forever)}</b> dùng vĩnh viễn, trả một lần</p>` : `<div class="pprice">${vnd(P.forever)} <small>vĩnh viễn</small></div>`) : ""}
+      ${P.year ? (() => { const alt = [P.half ? `<b>${vnd(P.half)}</b> / 6 tháng` : "", P.forever ? `<b>${vnd(P.forever)}</b> dùng vĩnh viễn` : ""].filter(Boolean); return alt.length ? `<p class="palt">hoặc ${alt.join(" · ")}</p>` : ""; })() : P.forever ? `<div class="pprice">${vnd(P.forever)} <small>vĩnh viễn</small></div>` : ""}
       <ul class="plist">
         <li><span><b>Không giới hạn</b> tất cả ${Object.keys(KIND_NAME).length} công cụ</span></li>
         <li>Tách hóa đơn, đọc XML, PDF sang Word/Excel không giới hạn số lượng</li>
@@ -1441,14 +1441,14 @@ function renderPricing() {
   <h2>Cách nâng cấp PRO</h2>
   <ol class="psteps">
     <li><b>Đăng nhập Google</b>Bấm nút Đăng nhập ở góc trên bên phải của app.</li>
-    <li><b>Gửi email cho người bán</b>Mở ô tài khoản, bấm "Sao chép email để gửi" rồi nhắn qua Zalo${zl ? " " + esc(P.zalo) : ""}, chọn gói năm hoặc vĩnh viễn.</li>
+    <li><b>Gửi email cho người bán</b>Mở ô tài khoản, bấm "Sao chép email để gửi" rồi nhắn qua Zalo${zl ? " " + esc(P.zalo) : ""}, chọn gói ${[P.half ? "6 tháng" : "", P.year ? "1 năm" : "", P.forever ? "vĩnh viễn" : ""].filter(Boolean).join(", ").replace(/, ([^,]*)$/, " hoặc $1")}.</li>
     <li><b>Chuyển khoản và dùng ngay</b>Chuyển khoản theo hướng dẫn qua Zalo. Khi được kích hoạt, tải lại trang là dùng PRO.</li>
   </ol>
   <h2>Câu hỏi thường gặp</h2>
   <div class="faq">
     <details><summary>Một tài khoản PRO dùng được mấy máy?</summary><p>${P.devices} máy (máy tính hoặc điện thoại). Máy không mở app 30 ngày sẽ tự được gỡ khỏi danh sách. Cần đổi máy gấp thì nhắn Zalo để được hỗ trợ.</p></details>
     <details><summary>File của tôi có bị tải lên mạng không?</summary><p>Không. Mọi file được xử lý ngay trên máy bạn. Máy chủ chỉ lưu email và số lượt đã dùng để quản lý bản quyền.</p></details>
-    <details><summary>Hết hạn gói năm thì sao?</summary><p>Tài khoản trở về bản dùng thử, các công cụ miễn phí vẫn dùng bình thường. Muốn gia hạn thì nhắn Zalo, thời hạn được cộng nối tiếp.</p></details>
+    <details><summary>Hết hạn gói thì sao?</summary><p>Tài khoản trở về bản dùng thử, các công cụ miễn phí vẫn dùng bình thường. Muốn gia hạn thì nhắn Zalo, thời hạn được cộng nối tiếp.</p></details>
     <details><summary>Có cần cài đặt gì không?</summary><p>Không cần. App chạy trên trình duyệt (Chrome, Edge, Safari…). Có thể bấm "Cài app" để mở nhanh như phần mềm trên máy.</p></details>
   </div>
 </div>`;
@@ -1457,7 +1457,7 @@ async function loadPricing() {
   renderPricing();
   if (pricingLoaded) return; pricingLoaded = true;
   const r = await cloud.info();
-  if (r) { if (r.year !== undefined) PRICING.year = r.year; if (r.forever !== undefined) PRICING.forever = r.forever; if (r.zalo) PRICING.zalo = r.zalo; if (r.devices) PRICING.devices = r.devices; if (r.free) PRICING.free = r.free; if (window.__curView === "banggia") renderPricing(); }
+  if (r) { if (r.year !== undefined) PRICING.year = r.year; if (r.half !== undefined) PRICING.half = r.half; if (r.forever !== undefined) PRICING.forever = r.forever; if (r.zalo) PRICING.zalo = r.zalo; if (r.devices) PRICING.devices = r.devices; if (r.free) PRICING.free = r.free; if (window.__curView === "banggia") renderPricing(); }
 }
 $("lnkPrice").addEventListener("click", () => toggleLic(false));
 $("toolJump").innerHTML = `<option value="">Chuyển công cụ…</option>` + GROUPS.map((g) => `<optgroup label="${g.name}">` + g.tools.map((k) => `<option value="${k}">${VIEWS[k].name}</option>`).join("") + "</optgroup>").join("");
@@ -1469,6 +1469,7 @@ function showView(v) {
   window.__curView = v; try { renderLic(); } catch {}
   for (const [k, x] of Object.entries(VIEWS)) $(x.el).hidden = k !== v;
   $("crumb").hidden = v === "home";
+  $("toolJump").hidden = v === "banggia";   // trang Bảng giá không phải công cụ
   $("appTitle").innerHTML = VIEWS[v].title; $("appSub").textContent = VIEWS[v].sub;
   document.title = v === "home" ? "PDF Vạn Năng – Bộ công cụ PDF cho văn phòng" : `${VIEWS[v].name} – PDF Vạn Năng`;
   if (prev && prev !== v) window.scrollTo({ top: 0 });
